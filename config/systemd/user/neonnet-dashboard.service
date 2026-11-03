@@ -1,0 +1,26 @@
+[Unit]
+# NEONNET local dashboard — static HTTP server on 127.0.0.1:8080 serving the
+# LibreWolf new-tab dashboard (~/rice-selfcheckout/browsers/librewolf/newtab/).
+# Why a local server instead of file://:
+#   - Spotify / Google OAuth refuse file:// redirect URIs; http://localhost
+#     is on their allowed origin list.
+#   - file:// has stricter CORS rules that block fetch() to sibling JSONs
+#     and many third-party APIs.
+#   - Single origin (localhost:8080) means one set of rules for everything
+#     the dashboard talks to.
+# Binds 127.0.0.1 only — never exposed to LAN or WAN.
+Description=NEONNET local dashboard (HTTP on 127.0.0.1:8080)
+After=graphical-session.target
+
+[Service]
+Type=simple
+WorkingDirectory=%h/rice-selfcheckout/browsers/librewolf/newtab
+ExecStart=/usr/bin/python3 -u -m http.server 8080 --bind 127.0.0.1
+Restart=on-failure
+RestartSec=5s
+# Python http.server is stdlib — no venv or pip install needed.
+StandardOutput=journal
+StandardError=journal
+
+[Install]
+WantedBy=default.target

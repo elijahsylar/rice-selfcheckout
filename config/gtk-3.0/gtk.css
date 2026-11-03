@@ -1,0 +1,160 @@
+/* SelfCheckout — GTK 3 user overrides */
+/* Written for the SelfCheckout rice. */
+/* Palette: phosphor green on black, amber as the only warm accent (see README). */
+/* Additive overrides on top of Yaru-dark; do NOT replace the theme. */
+
+@define-color sc_bg          #000000;
+@define-color sc_panel       #0a0a0a;
+@define-color sc_hover       #001a0a;
+@define-color sc_border      #1a3a1a;
+@define-color sc_border_lit  #00ff41;
+@define-color sc_text        #c0ffcc;
+@define-color sc_text_dim    #4a7a5a;
+@define-color sc_text_ghost  #2a4a2a;
+@define-color sc_green       #00ff41;
+@define-color sc_green_dark  #00cc33;
+@define-color sc_amber       #ffaa00;
+@define-color sc_red         #ff0033;
+
+/* Override Yaru/Adwaita accent semantics. These cascade through dozens of
+   widgets without us having to enumerate each one. */
+@define-color theme_selected_bg_color   @sc_green;
+@define-color theme_selected_fg_color   @sc_bg;
+@define-color accent_color              @sc_green;
+@define-color accent_bg_color           @sc_green;
+@define-color accent_fg_color           @sc_bg;
+@define-color suggested_action_color    @sc_green;
+@define-color destructive_color         @sc_red;
+@define-color warning_color             @sc_amber;
+@define-color error_color               @sc_red;
+@define-color success_color             @sc_green;
+@define-color link_color                @sc_green;
+@define-color visited_link_color        @sc_amber;
+
+/* Selection */
+selection {
+    background-color: @sc_green;
+    color: @sc_bg;
+}
+
+/* Text entries */
+entry, .entry {
+    caret-color: @sc_green;
+}
+entry:focus, .entry:focus {
+    border-color: @sc_green;
+    box-shadow: inset 0 0 0 1px @sc_green;
+}
+entry selection {
+    background-color: @sc_green;
+    color: @sc_bg;
+}
+
+/* Buttons — Yaru-dark already provides shape; we just steer accents */
+button:checked, button:active {
+    color: @sc_green;
+    border-color: @sc_green;
+}
+button.suggested-action {
+    background-color: @sc_green;
+    color: @sc_bg;
+    border-color: @sc_green;
+}
+button.destructive-action {
+    color: @sc_red;
+    border-color: @sc_red;
+}
+
+/* Switches */
+switch:checked {
+    background-color: @sc_green;
+}
+switch:checked image {
+    color: @sc_bg;
+}
+
+/* Sliders */
+scale highlight {
+    background-color: @sc_green;
+}
+scale slider {
+    background-color: @sc_green;
+}
+
+/* Progress bars */
+progressbar > trough > progress {
+    background-color: @sc_green;
+}
+
+/* Scrollbars — phosphor on hover */
+scrollbar slider {
+    background-color: @sc_border;
+}
+scrollbar slider:hover {
+    background-color: @sc_text_dim;
+}
+scrollbar slider:active {
+    background-color: @sc_green;
+}
+
+/* Notebook tabs */
+notebook tab:checked {
+    box-shadow: inset 0 -2px @sc_green;
+}
+notebook tab:checked label {
+    color: @sc_green;
+}
+
+/* Headerbars — keep theme background, just tweak focus accents on title */
+headerbar entry:focus,
+headerbar .entry:focus {
+    border-color: @sc_green;
+}
+
+/* Treeview / list rows on selection */
+treeview.view:selected,
+list row:selected,
+.view:selected {
+    background-color: @sc_green;
+    color: @sc_bg;
+}
+
+/* Menu items */
+menuitem:hover, menuitem:focus {
+    background-color: alpha(@sc_green, 0.20);
+    color: @sc_green;
+}
+menuitem:checked, menuitem:active {
+    color: @sc_green;
+}
+
+/* Links */
+*:link, *:visited {
+    color: @sc_green;
+}
+*:visited {
+    color: @sc_amber;
+}
+
+/* Body font — VT323 across GTK widgets. Headerbars / dialog titles inherit
+   theme defaults to keep small UI text readable; set font-family broadly
+   here and let GTK use it where reasonable. */
+* {
+    font-family: "VT323", "Courier New", monospace;
+    font-size: 11pt;
+}
+
+/* Tooltips */
+tooltip, tooltip.background {
+    background-color: @sc_panel;
+    border: 1px solid @sc_border;
+    color: @sc_text;
+}
+tooltip label {
+    color: @sc_text;
+}
+
+/* Spinner / loading indicators */
+spinner {
+    color: @sc_green;
+}

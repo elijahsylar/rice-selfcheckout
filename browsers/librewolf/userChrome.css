@@ -1,0 +1,631 @@
+/* SelfCheckout — Firefox userChrome.css */
+/* Written for the SelfCheckout rice. */
+/* Palette: phosphor green on black, amber as the only warm accent (see README). */
+/* Requires: toolkit.legacyUserProfileCustomizations.stylesheets = true */
+
+@namespace url("http://www.mozilla.org/keymaster/gatekeeper/there.is.only.xul");
+
+:root {
+    --sc-bg:        #000000;
+    --sc-panel:     #0a0a0a;
+    --sc-hover:     #001a0a;
+    --sc-border:    #1a3a1a;
+    --sc-border-lit:#00ff41;
+    --sc-text:      #c0ffcc;
+    --sc-text-dim:  #4a7a5a;
+    --sc-green:     #00ff41;
+    --sc-green-dark:#00cc33;
+    --sc-green-glow: rgba(0, 255, 65, 0.50);
+    --sc-amber:     #ffaa00;
+    --sc-red:       #ff0033;
+}
+
+/* ==== Window root — solid black everywhere, kill transparency ==== */
+/* Fix for titlebar/menubar bleeding through to desktop behind Firefox. */
+:root,
+:root[tabsintitlebar],
+window,
+#main-window {
+    background-color: var(--sc-bg) !important;
+    color: var(--sc-text) !important;
+}
+
+#titlebar,
+#toolbar-menubar,
+.titlebar-buttonbox-container,
+.titlebar-buttonbox {
+    background-color: var(--sc-bg) !important;
+    color: var(--sc-text) !important;
+}
+
+/* Menubar items (File / Edit / View / History / Bookmarks / Tools / Help) */
+#main-menubar,
+#main-menubar > menu {
+    background-color: var(--sc-bg) !important;
+    color: var(--sc-text) !important;
+    font-family: "VT323", "Courier New", monospace !important;
+}
+#main-menubar > menu:hover,
+#main-menubar > menu[_moz-menuactive="true"],
+#main-menubar > menu[open="true"] {
+    background-color: rgba(0, 255, 65, 0.15) !important;
+    color: var(--sc-green) !important;
+}
+
+/* ==== Toolbar stack + scanline overlay ==== */
+#navigator-toolbox {
+    background-color: var(--sc-bg) !important;
+    background-image: repeating-linear-gradient(
+        0deg,
+        transparent 0,
+        transparent 2px,
+        rgba(0, 255, 65, 0.04) 2px,
+        rgba(0, 255, 65, 0.04) 3px
+    ) !important;
+    border-bottom: 1px solid var(--sc-border) !important;
+}
+
+/* TabsToolbar gets its own solid bg too, so the tab row
+   reads as part of the titlebar band, not as a transparent overlay. */
+#TabsToolbar {
+    background-color: var(--sc-bg) !important;
+    color: var(--sc-text) !important;
+}
+
+#nav-bar,
+#PersonalToolbar {
+    background-color: transparent !important;
+    color: var(--sc-text) !important;
+}
+#PersonalToolbar {
+    border-top: 1px solid var(--sc-border) !important;
+}
+
+/* ==== URL bar ==== */
+#urlbar {
+    font-family: "VT323", "Courier New", monospace !important;
+    font-size: 17pt !important;
+    --toolbar-field-background-color: var(--sc-panel) !important;
+    --toolbar-field-color: var(--sc-text) !important;
+    --toolbar-field-focus-background-color: var(--sc-panel) !important;
+    --toolbar-field-focus-color: var(--sc-text) !important;
+    --toolbar-field-border-color: var(--sc-border) !important;
+    --toolbar-field-focus-border-color: var(--sc-green) !important;
+    border-radius: 0 !important;
+}
+#urlbar[focused="true"] > #urlbar-background {
+    box-shadow: 0 0 0 1px var(--sc-green), 0 0 6px var(--sc-green-glow) !important;
+}
+#urlbar-input, .urlbar-input, #urlbar-scheme {
+    color: var(--sc-text) !important;
+}
+
+/* URL autocomplete dropdown */
+.urlbarView {
+    background-color: var(--sc-panel) !important;
+    border-color: var(--sc-border) !important;
+    font-family: "VT323", monospace !important;
+}
+.urlbarView-row {
+    color: var(--sc-text) !important;
+}
+.urlbarView-row[selected="true"],
+.urlbarView-row:hover {
+    background-color: rgba(0, 255, 65, 0.15) !important;
+}
+.urlbarView-row[selected="true"] .urlbarView-title,
+.urlbarView-row:hover .urlbarView-title {
+    color: var(--sc-green) !important;
+}
+.urlbarView-title { color: var(--sc-text) !important; }
+.urlbarView-url   { color: var(--sc-text-dim) !important; }
+
+/* ==== Tabs ==== */
+.tabbrowser-tab {
+    font-family: "VT323", monospace !important;
+}
+.tab-label {
+    color: var(--sc-text) !important;
+    font-family: "VT323", monospace !important;
+}
+.tab-background {
+    background-color: var(--sc-panel) !important;
+    border: none !important;
+    border-radius: 0 !important;
+}
+.tabbrowser-tab:hover:not([selected="true"]) .tab-background {
+    background-color: var(--sc-hover) !important;
+}
+.tabbrowser-tab[selected="true"] .tab-background {
+    background-color: var(--sc-bg) !important;
+    box-shadow: inset 0 -2px 0 var(--sc-green),
+                0 4px 8px rgba(0, 255, 65, 0.25) !important;
+}
+.tabbrowser-tab[selected="true"] .tab-label {
+    color: var(--sc-green) !important;
+}
+.tab-close-button {
+    color: var(--sc-text-dim) !important;
+    fill: var(--sc-text-dim) !important;
+}
+.tab-close-button:hover {
+    color: var(--sc-red) !important;
+    fill: var(--sc-red) !important;
+    background-color: transparent !important;
+}
+
+/* ==== Toolbar buttons ==== */
+toolbarbutton,
+.toolbarbutton-1 {
+    color: var(--sc-text) !important;
+    fill: var(--sc-text) !important;
+}
+toolbarbutton:hover,
+.toolbarbutton-1:hover:not([disabled]) {
+    background-color: rgba(0, 255, 65, 0.12) !important;
+    color: var(--sc-green) !important;
+    fill: var(--sc-green) !important;
+}
+toolbarbutton[open="true"],
+.toolbarbutton-1[open="true"] {
+    background-color: rgba(0, 255, 65, 0.20) !important;
+    color: var(--sc-green) !important;
+}
+
+/* Identity / padlock icon in URL bar */
+#identity-box .identity-box-button:hover {
+    background-color: rgba(0, 255, 65, 0.12) !important;
+}
+
+/* ==== Bookmarks ==== */
+.bookmark-item {
+    color: var(--sc-text) !important;
+    font-family: "VT323", monospace !important;
+}
+.bookmark-item:hover {
+    background-color: rgba(0, 255, 65, 0.12) !important;
+    color: var(--sc-green) !important;
+}
+
+/* ==== Menus & popups ==== */
+/* Catch-all: every menupopup/panel gets explicit background + disabled
+   native appearance. Without `-moz-appearance: none` Yaru-dark returns a
+   transparent surface for the native-fallback menupopup (toolbar context,
+   tab context, places context, etc.), which is unreadable over busy UI.
+   The CSS vars below still get set for downstream Firefox styling that
+   consumes --panel-background. */
+menupopup, panel {
+    --panel-background: var(--sc-panel) !important;
+    --panel-color: var(--sc-text) !important;
+    --panel-border-color: var(--sc-border) !important;
+    background-color: var(--sc-panel) !important;
+    color: var(--sc-text) !important;
+    -moz-appearance: none !important;
+    appearance: none !important;
+    border-radius: 0 !important;
+    font-family: "VT323", monospace !important;
+}
+menuitem, menu {
+    color: var(--sc-text) !important;
+}
+menuitem[_moz-menuactive="true"],
+menu[_moz-menuactive="true"],
+menuitem:hover,
+menu:hover {
+    background-color: rgba(0, 255, 65, 0.15) !important;
+    color: var(--sc-green) !important;
+}
+menuseparator {
+    border-top: 1px solid var(--sc-border) !important;
+}
+
+/* ==== Sidebar ==== */
+#sidebar-box, #sidebar {
+    background-color: var(--sc-panel) !important;
+    color: var(--sc-text) !important;
+}
+#sidebar-header {
+    background-color: var(--sc-bg) !important;
+    color: var(--sc-green) !important;
+    border-bottom: 1px solid var(--sc-border) !important;
+    font-family: "Major Mono Display", "VT323", monospace !important;
+}
+.sidebar-placesTree treechildren::-moz-tree-row(selected) {
+    background-color: rgba(0, 255, 65, 0.15) !important;
+}
+
+/* ==== Find bar ==== */
+.findbar-textbox {
+    background-color: var(--sc-panel) !important;
+    color: var(--sc-text) !important;
+    border: 1px solid var(--sc-border) !important;
+    font-family: "VT323", monospace !important;
+}
+.findbar-textbox:focus {
+    border-color: var(--sc-green) !important;
+    box-shadow: 0 0 4px var(--sc-green-glow) !important;
+}
+.findbar-find-next,
+.findbar-find-previous,
+.findbar-highlight {
+    color: var(--sc-text) !important;
+}
+
+/* ==== Notification bars (update avail, translation, etc.) ==== */
+notification-message {
+    background-color: var(--sc-panel) !important;
+    color: var(--sc-text) !important;
+    border: 1px solid var(--sc-green) !important;
+    border-radius: 0 !important;
+}
+
+/* ==== Scrollbars (Firefox chrome itself) ==== */
+scrollbar thumb {
+    background-color: var(--sc-border) !important;
+}
+scrollbar thumb:hover {
+    background-color: var(--sc-text-dim) !important;
+}
+
+/* ==== Fix 3 — force-repaint the in-titlebar area ==== */
+/* 2026-04-20 — kills -moz-appearance so Firefox stops honoring GTK CSD
+   paint in this band; then forces solid black + VT323 + phosphor mint. */
+:root[tabsintitlebar] #titlebar,
+:root[tabsintitlebar] #TabsToolbar,
+:root[tabsintitlebar] #toolbar-menubar,
+#titlebar,
+#TabsToolbar,
+#toolbar-menubar,
+.titlebar-buttonbox-container,
+.titlebar-spacer {
+    -moz-appearance: none !important;
+    appearance: none !important;
+    background: #000000 !important;
+    background-color: #000000 !important;
+    background-image: none !important;
+    color: var(--sc-text) !important;
+}
+
+/* Window control buttons (min/max/close) */
+.titlebar-button {
+    background-color: #000000 !important;
+}
+.titlebar-button:hover {
+    background-color: var(--sc-hover) !important;
+}
+#titlebar-close:hover {
+    background-color: #ff0033 !important;
+}
+
+/* Menubar text (File Edit View etc) */
+#main-menubar,
+#main-menubar > menu {
+    background: #000000 !important;
+    color: var(--sc-text) !important;
+    font-family: "VT323", monospace !important;
+}
+#main-menubar > menu > .menubar-text {
+    color: var(--sc-text) !important;
+    font-family: "VT323", monospace !important;
+}
+
+/* Broad overpower for CRT(Dark) theme's text color on every menubar node */
+menubar, menubar *,
+#main-menubar, #main-menubar *,
+#toolbar-menubar, #toolbar-menubar * {
+    color: #c0ffcc !important;
+    font-family: "VT323", monospace !important;
+}
+
+/* ==== Fix 4 — kill the thin transparent strip at the very top ==== */
+/* Native titlebar padding / drag-handle area still leaking desktop through. */
+:root {
+    --tab-min-height: 30px !important;
+}
+
+#titlebar {
+    min-height: 0 !important;
+    height: auto !important;
+}
+
+.titlebar-spacer,
+.titlebar-spacer[type="pre-tabs"],
+.titlebar-spacer[type="post-tabs"] {
+    background: #000000 !important;
+    background-color: #000000 !important;
+}
+
+#nav-bar {
+    margin-top: 0 !important;
+}
+
+#main-window,
+window[chromehidden~="toolbar"],
+#browser {
+    background: #000000 !important;
+    background-color: #000000 !important;
+}
+
+/* ==== Fix 4 — maximum-specificity menubar text overrides ==== */
+#toolbar-menubar menubar > menu,
+#toolbar-menubar menubar > menu > .menubar-text,
+#toolbar-menubar menubar > menu label,
+#toolbar-menubar menubar > menu description {
+    color: #c0ffcc !important;
+    font-family: "VT323", monospace !important;
+    font-size: 16px !important;
+}
+
+#toolbar-menubar menubar > menu:hover > .menubar-text,
+#toolbar-menubar menubar > menu[open="true"] > .menubar-text {
+    color: #00ff41 !important;
+}
+
+/* CRT (Dark) binds directly to these selectors; override in the same shape */
+menubar menu {
+    color: #c0ffcc !important;
+}
+menubar menu label {
+    color: #c0ffcc !important;
+}
+
+/* ==== Status bar at bottom (download / link preview) ==== */
+#statuspanel-label {
+    background-color: var(--sc-panel) !important;
+    color: var(--sc-text) !important;
+    border: 1px solid var(--sc-border) !important;
+    font-family: "VT323", monospace !important;
+}
+
+/* ==== FINAL BELT + BRACES — literal #000000, no var(), last in file ==== */
+/* Last rule in cascade; if nothing else pins chrome to black, this does.
+   Mirror of the magenta diagnostic's selector list — that confirmed these
+   selectors reach every chrome region. */
+:root, window, #main-window, #main-window > *,
+#titlebar, #navigator-toolbox, #browser, #browser-container,
+#tabbrowser-tabs, #toolbar-menubar, #nav-bar, #PersonalToolbar,
+#TabsToolbar, toolbar, .titlebar-buttonbox-container, .titlebar-spacer,
+hbox, vbox, box {
+    background-color: #000000 !important;
+    background-image: none !important;
+}
+
+/* Scanline texture restored ONLY on the toolbar row (not everywhere) via
+   a later, more-specific rule so it wins over the blanket black above
+   for this one selector. */
+#navigator-toolbox {
+    background-color: #000000 !important;
+    background-image: repeating-linear-gradient(
+        0deg,
+        transparent 0,
+        transparent 2px,
+        rgba(0, 255, 65, 0.04) 2px,
+        rgba(0, 255, 65, 0.04) 3px
+    ) !important;
+    border-bottom: 1px solid #1a3a1a !important;
+}
+
+/* ==== FINAL TEXT COLOR + FONT — literal hex, no var(), last in file ==== */
+/* Mirrors the black-bg fix above. If var(--sc-text) wasn't resolving on
+   chrome, color is falling back to white; kill that with #c0ffcc literal. */
+:root, window, #main-window, #main-window > *,
+#titlebar, #navigator-toolbox, #browser,
+#tabbrowser-tabs, #toolbar-menubar, #nav-bar, #PersonalToolbar,
+#TabsToolbar, toolbar, .titlebar-buttonbox-container, .titlebar-spacer,
+menubar, menubar *, #main-menubar, #main-menubar *,
+.menubar-text, menu, menuitem, menulabel,
+.tab-label, .tabbrowser-tab, .tab-content,
+.bookmark-item, toolbarbutton, .toolbarbutton-1, label, description {
+    color: #c0ffcc !important;
+    font-family: "VT323", "Courier New", monospace !important;
+}
+
+/* URL bar text specifically (it's a special XUL input element) */
+#urlbar, #urlbar-input, .urlbar-input-box, #urlbar-scheme {
+    color: #c0ffcc !important;
+    font-family: "VT323", "Courier New", monospace !important;
+}
+
+/* Active tab label override — bright green, wins over the mint above */
+.tabbrowser-tab[selected="true"] .tab-label,
+.tabbrowser-tab[selected="true"] .tab-content {
+    color: #00ff41 !important;
+}
+
+/* Menubar hover — bright green, wins */
+#main-menubar > menu:hover,
+#main-menubar > menu:hover > .menubar-text,
+#main-menubar > menu[open="true"],
+#main-menubar > menu[open="true"] > .menubar-text {
+    color: #00ff41 !important;
+}
+
+/* Bookmarks-bar hover — bright green */
+.bookmark-item:hover {
+    color: #00ff41 !important;
+}
+
+/* Toolbar button hover — bright green + icon fill */
+toolbarbutton:hover,
+.toolbarbutton-1:hover:not([disabled]) {
+    color: #00ff41 !important;
+    fill: #00ff41 !important;
+}
+
+/* ==== Tab close buttons — visible phosphor green, red on hover ==== */
+/* Same fix pattern as everything else: literal hex, high specificity,
+   last-in-file wins. The earlier var(--sc-text-dim) rules were resolving
+   to initial/transparent on the close-button pseudo-element.
+   NOTE: do NOT set list-style-image: none — that hid the × icon entirely.
+   Firefox's native SVG icon is recolored via -moz-context-properties. */
+.tab-close-button,
+.tabbrowser-tab .tab-close-button,
+.tabbrowser-tab:not([selected]) .tab-close-button {
+    color: #00ff41 !important;
+    fill: #00ff41 !important;
+    opacity: 1 !important;
+    -moz-context-properties: fill, stroke !important;
+}
+.tab-close-button > .toolbarbutton-icon,
+.tab-close-button .toolbarbutton-icon,
+.tab-close-button image {
+    fill: #00ff41 !important;
+    color: #00ff41 !important;
+    opacity: 1 !important;
+    -moz-context-properties: fill, stroke !important;
+}
+/* ==== Chrome font sizes — bookmarks / tabs / menubar bumped up ==== */
+/* Previous rules left these at default (inherited), which was ~10pt.
+   URL bar is 17pt; matching chrome elements to ~13-14pt so the whole
+   strip feels legible without looking oversized. */
+.bookmark-item,
+#PersonalToolbar .bookmark-item,
+#PlacesToolbar .bookmark-item {
+    font-size: 14pt !important;
+}
+.tabbrowser-tab .tab-label,
+.tabbrowser-tab .tab-content .tab-label {
+    font-size: 13pt !important;
+}
+#main-menubar > menu,
+#main-menubar > menu > .menubar-text {
+    font-size: 13pt !important;
+}
+menupopup menuitem,
+menupopup menu,
+menupopup .menu-text,
+menupopup label {
+    font-size: 13pt !important;
+}
+
+.tab-close-button:hover,
+.tab-close-button:hover > .toolbarbutton-icon,
+.tab-close-button:hover .toolbarbutton-icon,
+.tab-close-button:hover image {
+    color: #ff0033 !important;
+    fill: #ff0033 !important;
+    background-color: rgba(255, 0, 51, 0.15) !important;
+}
+
+/* ==== Fix #9 — web-content right-click menu opacity ==================== */
+/* Yaru-dark returns a transparent surface for -moz-appearance: menupopup,
+   which is what Gecko delegates #contentAreaContextMenu to on X11/GTK.
+   Disabling the native fallback and painting our own background fixes it.
+   Tab-bar / chrome menus are unaffected — they're styled by the
+   `menupopup, panel` block above. */
+#contentAreaContextMenu,
+#contentAreaContextMenu > menupopup,
+#contentAreaContextMenu .menupopup-arrowscrollbox {
+    background-color: #0a0a0a !important;
+    color: #c0ffcc !important;
+    opacity: 1 !important;
+    -moz-appearance: none !important;
+    appearance: none !important;
+    border: 1px solid #1a3a1a !important;
+}
+
+#contentAreaContextMenu menuitem,
+#contentAreaContextMenu menu {
+    color: #c0ffcc !important;
+    background-color: transparent !important;
+}
+
+#contentAreaContextMenu menuitem:hover,
+#contentAreaContextMenu menu:hover {
+    background-color: rgba(0, 255, 65, 0.15) !important;
+    color: #00ff41 !important;
+}
+
+/* Toolbar right-click (nav-bar / bookmark-toolbar / customize menus) */
+#toolbar-context-menu,
+#toolbar-context-menu > menupopup,
+#toolbar-context-menu .menupopup-arrowscrollbox {
+    background-color: #0a0a0a !important;
+    color: #c0ffcc !important;
+    opacity: 1 !important;
+    -moz-appearance: none !important;
+    appearance: none !important;
+    border: 1px solid #1a3a1a !important;
+}
+#toolbar-context-menu menuitem,
+#toolbar-context-menu menu {
+    color: #c0ffcc !important;
+    background-color: transparent !important;
+}
+#toolbar-context-menu menuitem:hover,
+#toolbar-context-menu menu:hover {
+    background-color: rgba(0, 255, 65, 0.15) !important;
+    color: #00ff41 !important;
+}
+
+/* Tab right-click (right-click on a tab) */
+#tabContextMenu,
+#tabContextMenu > menupopup,
+#tabContextMenu .menupopup-arrowscrollbox {
+    background-color: #0a0a0a !important;
+    color: #c0ffcc !important;
+    opacity: 1 !important;
+    -moz-appearance: none !important;
+    appearance: none !important;
+    border: 1px solid #1a3a1a !important;
+}
+#tabContextMenu menuitem,
+#tabContextMenu menu {
+    color: #c0ffcc !important;
+    background-color: transparent !important;
+}
+#tabContextMenu menuitem:hover,
+#tabContextMenu menu:hover {
+    background-color: rgba(0, 255, 65, 0.15) !important;
+    color: #00ff41 !important;
+}
+
+/* Places right-click (bookmarks / history library) */
+#placesContext,
+#placesContext > menupopup,
+#placesContext .menupopup-arrowscrollbox {
+    background-color: #0a0a0a !important;
+    color: #c0ffcc !important;
+    opacity: 1 !important;
+    -moz-appearance: none !important;
+    appearance: none !important;
+    border: 1px solid #1a3a1a !important;
+}
+#placesContext menuitem,
+#placesContext menu {
+    color: #c0ffcc !important;
+    background-color: transparent !important;
+}
+#placesContext menuitem:hover,
+#placesContext menu:hover {
+    background-color: rgba(0, 255, 65, 0.15) !important;
+    color: #00ff41 !important;
+}
+
+/* ==== Fix #11 — lock toolbars to solid black through all hover states ==== */
+/* The nav bar / tab bar / titlebar band was going translucent on mouse-over,
+   letting the desktop bleed through. Pin every toolbar surface to solid black
+   with -moz-appearance off so no native GTK fallback or CSD hover animation
+   can re-introduce transparency. */
+#navigator-toolbox,
+#navigator-toolbox:hover,
+#nav-bar,
+#nav-bar:hover,
+#PersonalToolbar,
+#PersonalToolbar:hover,
+#TabsToolbar,
+#TabsToolbar:hover,
+#titlebar,
+#titlebar:hover {
+    background-color: #000000 !important;
+    background:       #000000 !important;
+    opacity: 1 !important;
+    -moz-appearance: none !important;
+}
+
+/* Toolbar buttons — keep hover readable and consistent with the menu hover
+   color. Without this they'd inherit Yaru button hover which clashes. */
+toolbarbutton:hover,
+.toolbarbutton-1:hover {
+    background-color: rgba(0, 255, 65, 0.15) !important;
+}

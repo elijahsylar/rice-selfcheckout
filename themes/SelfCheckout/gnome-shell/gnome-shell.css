@@ -1,0 +1,14 @@
+/* SelfCheckout — GNOME Shell theme (v3, two-rule minimum) */
+/* Minimal shell theme: only the panel rules. If this loads cleanly,
+   we layer more on top in later iterations. If this breaks the panel,
+   we permanently give up on shell theming on this GNOME 42.9 + Yaru box. */
+
+#panel {
+    background-color: #000000;
+    color: #c0ffcc;
+}
+
+#panel .panel-button {
+    color: #c0ffcc;
+    font-family: "VT323", monospace;
+}

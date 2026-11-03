@@ -1,0 +1,15 @@
+#!/usr/bin/env bash
+# SelfCheckout rice: stop GRTA and switch to a regular wallpaper.
+#   wallpaper-static [image]   (default: $RICE_STATIC_WALLPAPER, else the black one)
+set -u
+
+IMG="${1:-${RICE_STATIC_WALLPAPER:-$HOME/Pictures/wallpapers/selfcheckout/grta-bg-black.png}}"
+
+pkill -f "conky.*grta" 2>/dev/null || true
+sleep 0.3
+
+gsettings set org.gnome.desktop.background picture-uri      "file://$IMG"
+gsettings set org.gnome.desktop.background picture-uri-dark "file://$IMG"
+gsettings set org.gnome.desktop.background picture-options  'zoom'
+
+echo "wallpaper-static: GRTA stopped, wallpaper set to $IMG"

@@ -1,0 +1,5 @@
+[/]
+enabled-extensions=['user-theme@gnome-shell-extensions.gcampax.github.com']
+
+[extensions/user-theme]
+name='Yaru-SelfCheckout'

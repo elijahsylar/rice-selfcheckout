@@ -1,0 +1,154 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>HOME // spotify callback</title>
+<style>
+  :root {
+    --sc-bg:     #000000;
+    --sc-panel:  #0a0a0a;
+    --sc-border: #1a3a1a;
+    --sc-text:   #c0ffcc;
+    --sc-green:  #00ff41;
+    --sc-amber:  #ffaa00;
+    --sc-red:    #ff0033;
+    --sc-dim:    #4a7a5a;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    background: var(--sc-bg);
+    color: var(--sc-text);
+    font-family: "VT323", monospace;
+    font-size: 20px;
+    min-height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 40px;
+  }
+  body::before {
+    content: "";
+    position: fixed;
+    inset: 0;
+    pointer-events: none;
+    background-image: repeating-linear-gradient(
+      to bottom,
+      transparent 0, transparent 2px,
+      rgba(0, 255, 65, 0.04) 2px, rgba(0, 255, 65, 0.04) 3px
+    );
+  }
+  .panel {
+    background: var(--sc-panel);
+    border: 1px solid var(--sc-border);
+    padding: 32px 40px;
+    max-width: 520px;
+    width: 100%;
+    position: relative;
+  }
+  h1 {
+    font-size: 18px;
+    letter-spacing: 3px;
+    color: var(--sc-green);
+    text-transform: uppercase;
+    margin-bottom: 20px;
+    padding-bottom: 14px;
+    border-bottom: 1px solid var(--sc-border);
+    text-shadow: 0 0 6px rgba(0, 255, 65, 0.25);
+  }
+  h1::before { content: "// "; color: var(--sc-dim); }
+  #status {
+    font-size: 18px;
+    line-height: 1.5;
+    word-break: break-word;
+  }
+  #status.ok    { color: var(--sc-green); }
+  #status.err   { color: var(--sc-red); }
+  #status.dim   { color: var(--sc-dim); }
+  .hint {
+    margin-top: 14px;
+    font-size: 14px;
+    color: var(--sc-dim);
+    letter-spacing: 1px;
+  }
+  a { color: var(--sc-green); }
+</style>
+</head>
+<body>
+<div class="panel">
+  <h1>spotify callback</h1>
+  <div id="status" class="dim">exchanging authorization…</div>
+  <div class="hint" id="hint"></div>
+</div>
+<script>
+(async () => {
+  const status = document.getElementById("status");
+  const hint = document.getElementById("hint");
+  const setState = (cls, text, hintText) => {
+    status.className = cls;
+    status.textContent = text;
+    if (hintText !== undefined) hint.textContent = hintText;
+  };
+
+  const KEYS = {
+    cid:     "home.spotify.client_id",
+    verifier:"home.spotify.verifier",
+    access:  "home.spotify.access_token",
+    refresh: "home.spotify.refresh_token",
+    exp:     "home.spotify.expires_at"
+  };
+
+  const params = new URLSearchParams(window.location.search);
+  const code = params.get("code");
+  const err = params.get("error");
+
+  if (err) {
+    setState("err", "oauth error: " + err,
+             "click 'connect spotify' again on the dashboard to retry.");
+    return;
+  }
+  if (!code) {
+    setState("err", "no authorization code in callback url.",
+             "open the dashboard and start the connect flow.");
+    return;
+  }
+
+  const verifier = localStorage.getItem(KEYS.verifier);
+  const cid = localStorage.getItem(KEYS.cid);
+  if (!verifier || !cid) {
+    setState("err", "missing pkce verifier or client id in local storage.",
+             "the auth flow state was lost — restart from the dashboard.");
+    return;
+  }
+
+  try {
+    const res = await fetch("https://accounts.spotify.com/api/token", {
+      method: "POST",
+      headers: { "Content-Type": "application/x-www-form-urlencoded" },
+      body: new URLSearchParams({
+        client_id: cid,
+        grant_type: "authorization_code",
+        code: code,
+        redirect_uri: window.location.origin + "/callback.html",
+        code_verifier: verifier
+      })
+    });
+    const data = await res.json();
+    if (!res.ok || !data.access_token) {
+      setState("err", "token exchange failed: " + (data.error_description || data.error || res.status),
+               "verify the client id and the redirect uri registered in your spotify app match exactly.");
+      return;
+    }
+    localStorage.setItem(KEYS.access, data.access_token);
+    localStorage.setItem(KEYS.refresh, data.refresh_token);
+    localStorage.setItem(KEYS.exp, Date.now() + (data.expires_in - 60) * 1000);
+    localStorage.removeItem(KEYS.verifier);
+    setState("ok", "connected. redirecting to dashboard…", "");
+    setTimeout(() => { window.location.href = "/"; }, 900);
+  } catch (e) {
+    setState("err", "network error during token exchange: " + e.message,
+             "check your connection and try again from the dashboard.");
+  }
+})();
+</script>
+</body>
+</html>

@@ -1,0 +1,139 @@
+/* SelfCheckout — Firefox userContent.css */
+/* Written for the SelfCheckout rice. */
+/* Styles internal about: pages only. Regular websites are untouched. */
+/* Palette: phosphor green on black, amber as the only warm accent (see README). */
+
+/* ==== about:newtab, about:home ==== */
+@-moz-document url("about:newtab"),
+               url("about:home"),
+               url-prefix("about:home?") {
+    body, .outer-wrapper, .activity-stream, #root,
+    .has-search, .no-recommended-stories, .ds-outer-wrapper-breakpoint-override {
+        background-color: #000000 !important;
+        background-image: none !important;
+        color: #c0ffcc !important;
+        font-family: "VT323", "Courier New", monospace !important;
+    }
+    /* Kill the new-tab wallpaper CSS variables at the root */
+    :root {
+        --newtab-wallpaper: none !important;
+        --newtab-wallpaper-color: #000000 !important;
+        --newtab-background-color: #000000 !important;
+    }
+    .search-wrapper input,
+    .search-handoff-button,
+    .fake-editable {
+        background-color: #0a0a0a !important;
+        color: #c0ffcc !important;
+        border: 1px solid #1a3a1a !important;
+        font-family: "VT323", monospace !important;
+    }
+    .search-wrapper input:focus,
+    .search-handoff-button:focus {
+        border-color: #00ff41 !important;
+        box-shadow: 0 0 6px rgba(0, 255, 65, 0.4) !important;
+    }
+    .top-sites-list .top-site-outer .top-site-inner .top-site-icon {
+        background-color: #0a0a0a !important;
+        border: 1px solid #1a3a1a !important;
+    }
+    .top-sites-list .top-site-outer:hover .top-site-inner .top-site-icon {
+        border-color: #00ff41 !important;
+    }
+    .top-sites-list .title {
+        color: #c0ffcc !important;
+    }
+    .section-title, h2, h3 {
+        color: #00ff41 !important;
+        font-family: "Major Mono Display", "VT323", monospace !important;
+    }
+    a {
+        color: #00ff41 !important;
+    }
+    a:hover {
+        color: #00ff41 !important;
+        text-shadow: 0 0 6px rgba(0, 255, 65, 0.5) !important;
+    }
+}
+
+/* ==== about:preferences ==== */
+@-moz-document url-prefix("about:preferences") {
+    body, .main-content {
+        background-color: #000000 !important;
+        color: #c0ffcc !important;
+        font-family: "VT323", "Courier New", monospace !important;
+    }
+    #categories {
+        background-color: #0a0a0a !important;
+        border-right: 1px solid #1a3a1a !important;
+    }
+    .category {
+        color: #c0ffcc !important;
+    }
+    .category:hover {
+        background-color: rgba(0, 255, 65, 0.08) !important;
+        color: #00ff41 !important;
+    }
+    .category[selected] {
+        background-color: rgba(0, 255, 65, 0.15) !important;
+        color: #00ff41 !important;
+    }
+    h1, h2, h3, .header-name, groupbox > caption {
+        color: #00ff41 !important;
+        font-family: "Major Mono Display", "VT323", monospace !important;
+    }
+    description, label {
+        color: #c0ffcc !important;
+    }
+    input[type="text"], input[type="email"], input[type="password"],
+    input[type="number"], input[type="url"], textarea, select, menulist {
+        background-color: #0a0a0a !important;
+        color: #c0ffcc !important;
+        border: 1px solid #1a3a1a !important;
+        font-family: "VT323", monospace !important;
+    }
+    input:focus, textarea:focus, select:focus, menulist:focus {
+        border-color: #00ff41 !important;
+        outline-color: #00ff41 !important;
+    }
+    button {
+        background-color: #0a0a0a !important;
+        color: #c0ffcc !important;
+        border: 1px solid #1a3a1a !important;
+        font-family: "VT323", monospace !important;
+    }
+    button:hover {
+        border-color: #00ff41 !important;
+        color: #00ff41 !important;
+        background-color: rgba(0, 255, 65, 0.08) !important;
+    }
+    button.primary, button[default="true"] {
+        background-color: #00cc33 !important;
+        color: #000000 !important;
+    }
+    button.primary:hover {
+        background-color: #00ff41 !important;
+    }
+    a { color: #00ff41 !important; }
+    a:hover { text-shadow: 0 0 6px rgba(0, 255, 65, 0.5) !important; }
+}
+
+/* ==== about:addons ==== */
+@-moz-document url-prefix("about:addons") {
+    body {
+        background-color: #000000 !important;
+        color: #c0ffcc !important;
+        font-family: "VT323", "Courier New", monospace !important;
+    }
+    h1, h2, h3 {
+        color: #00ff41 !important;
+        font-family: "Major Mono Display", "VT323", monospace !important;
+    }
+    .addon, .card {
+        background-color: #0a0a0a !important;
+        border: 1px solid #1a3a1a !important;
+    }
+    .addon:hover, .card:hover {
+        border-color: #00ff41 !important;
+    }
+}

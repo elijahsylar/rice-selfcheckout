@@ -1,0 +1,98 @@
+/* SelfCheckout — GTK 4 user overrides */
+/* Written for the SelfCheckout rice. */
+/* Palette: phosphor green on black, amber as the only warm accent (see README). */
+/* Additive on top of system Adwaita-dark / Yaru variant. */
+
+@define-color sc_bg          #000000;
+@define-color sc_panel       #0a0a0a;
+@define-color sc_hover       #001a0a;
+@define-color sc_border      #1a3a1a;
+@define-color sc_text        #c0ffcc;
+@define-color sc_text_dim    #4a7a5a;
+@define-color sc_green       #00ff41;
+@define-color sc_green_dark  #00cc33;
+@define-color sc_amber       #ffaa00;
+@define-color sc_red         #ff0033;
+
+/* GTK 4 / libadwaita named colors. Overriding these cascades through
+   nearly every widget that uses accent. */
+@define-color accent_color              @sc_green;
+@define-color accent_bg_color           @sc_green;
+@define-color accent_fg_color           @sc_bg;
+@define-color destructive_color         @sc_red;
+@define-color destructive_bg_color      @sc_red;
+@define-color destructive_fg_color      @sc_bg;
+@define-color success_color             @sc_green;
+@define-color success_bg_color          @sc_green;
+@define-color warning_color             @sc_amber;
+@define-color warning_bg_color          @sc_amber;
+@define-color error_color               @sc_red;
+@define-color error_bg_color            @sc_red;
+
+selection {
+    background-color: @sc_green;
+    color: @sc_bg;
+}
+
+entry:focus, entry:focus-within {
+    outline-color: @sc_green;
+    border-color: @sc_green;
+}
+entry selection {
+    background-color: @sc_green;
+    color: @sc_bg;
+}
+
+button.suggested-action {
+    background-color: @sc_green;
+    color: @sc_bg;
+}
+button.destructive-action {
+    background-color: @sc_red;
+    color: @sc_bg;
+}
+
+switch:checked {
+    background-color: @sc_green;
+}
+
+scale > trough > highlight {
+    background-color: @sc_green;
+}
+scale > trough > slider {
+    background-color: @sc_green;
+}
+
+progressbar > trough > progress {
+    background-color: @sc_green;
+}
+
+row:selected, list row:selected {
+    background-color: @sc_green;
+    color: @sc_bg;
+}
+
+scrollbar slider {
+    background-color: @sc_border;
+}
+scrollbar slider:hover {
+    background-color: @sc_text_dim;
+}
+scrollbar slider:active {
+    background-color: @sc_green;
+}
+
+* {
+    font-family: "VT323", "Courier New", monospace;
+    font-size: 11pt;
+}
+
+tooltip, tooltip.background {
+    background-color: @sc_panel;
+    border: 1px solid @sc_border;
+    color: @sc_text;
+}
+
+spinner {
+    color: @sc_green;
+}

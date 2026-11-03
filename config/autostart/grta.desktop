@@ -1,0 +1,8 @@
+[Desktop Entry]
+Type=Application
+Name=GRTA Fullscreen Face
+Comment=SelfCheckout rice: fullscreen GRTA companion
+Exec=sh -c 'conky -c "$HOME/.config/conky/grta/conky.conf" -d'
+Terminal=false
+X-GNOME-Autostart-enabled=true
+NoDisplay=false

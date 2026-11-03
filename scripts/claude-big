@@ -1,0 +1,10 @@
+#!/usr/bin/env bash
+# SelfCheckout rice — Claude Code launcher in a smaller-font kitty window.
+# kitty globally runs VT323 20 for general terminal work; Claude Code
+# sessions are content-dense and overflow at that size, so override to 16
+# just for this invocation. Kitty global config stays untouched.
+#
+# Use: `claude-big` (yes, name inherited from original brainstorm — runs
+# Claude Code in a smaller window despite what the name implies).
+
+exec kitty --override font_size=16 -e claude "$@"

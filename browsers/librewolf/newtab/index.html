@@ -1,0 +1,1384 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>HOME // new tab</title>
+<style>
+  :root {
+    --sc-bg:         #000000;
+    --sc-panel:      #0a0a0a;
+    --sc-hover:      #001a0a;
+    --sc-border:     #1a3a1a;
+    --sc-border-lit: #00ff41;
+    --sc-text:       #c0ffcc;
+    --sc-text-dim:   #4a7a5a;
+    --sc-text-ghost: #2a4a2a;
+    --sc-green:      #00ff41;
+    --sc-green-dim:  #00cc33;
+    --sc-amber:      #ffaa00;
+    --sc-red:        #ff0033;
+    --sc-glow:       0 0 12px rgba(0, 255, 65, 0.35);
+    --sc-glow-soft:  0 0 6px  rgba(0, 255, 65, 0.18);
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  html, body {
+    background: var(--sc-bg);
+    color: var(--sc-text);
+    font-family: "VT323", monospace;
+    font-size: 20px;
+    min-height: 100vh;
+    overflow-x: hidden;
+  }
+
+  /* Scanlines overlay — classic CRT scanline pattern */
+  body::before {
+    content: "";
+    position: fixed;
+    inset: 0;
+    pointer-events: none;
+    z-index: 1;
+    background-image: repeating-linear-gradient(
+      to bottom,
+      transparent 0,
+      transparent 2px,
+      rgba(0, 255, 65, 0.04) 2px,
+      rgba(0, 255, 65, 0.04) 3px
+    );
+  }
+
+  .wrap {
+    max-width: 1400px;
+    margin: 0 auto;
+    padding: 40px 32px 60px;
+    position: relative;
+    z-index: 2;
+  }
+
+  /* ===== Header ===== */
+  header {
+    display: flex;
+    align-items: baseline;
+    justify-content: space-between;
+    padding-bottom: 18px;
+    border-bottom: 1px solid var(--sc-border);
+    margin-bottom: 32px;
+  }
+  .greeting {
+    font-family: "VT323", monospace;
+    font-size: 28px;
+    color: var(--sc-green);
+    letter-spacing: 2px;
+    text-shadow: var(--sc-glow-soft);
+  }
+  .greeting .cursor {
+    display: inline-block;
+    width: 10px; height: 22px;
+    background: var(--sc-green);
+    margin-left: 4px;
+    animation: blink 1s steps(2) infinite;
+    vertical-align: middle;
+  }
+  .clock {
+    font-family: "VT323", monospace;
+    font-size: 22px;
+    color: var(--sc-text-dim);
+    letter-spacing: 1px;
+  }
+  .clock .sep { color: var(--sc-green); }
+  @keyframes blink { 50% { opacity: 0; } }
+
+  /* ===== Row headers ===== */
+  .row-label {
+    font-family: "VT323", monospace;
+    font-size: 13px;
+    letter-spacing: 3px;
+    color: var(--sc-text-dim);
+    text-transform: uppercase;
+    margin: 28px 0 10px;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+  }
+  .row-label::before {
+    content: "//";
+    color: var(--sc-green);
+  }
+  .row-label::after {
+    content: "";
+    flex: 1;
+    height: 1px;
+    background: var(--sc-border);
+  }
+
+  /* ===== Grid rows ===== */
+  .grid-5 {
+    display: grid;
+    grid-template-columns: repeat(5, 1fr);
+    gap: 16px;
+  }
+  .grid-4 {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 16px;
+  }
+  .grid-3 {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 16px;
+  }
+  .grid-2 {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 16px;
+  }
+
+  @media (max-width: 1200px) {
+    .grid-5 { grid-template-columns: repeat(3, 1fr); }
+  }
+  @media (max-width: 1000px) {
+    .grid-4 { grid-template-columns: repeat(2, 1fr); }
+    .grid-3 { grid-template-columns: 1fr; }
+    .grid-2 { grid-template-columns: 1fr; }
+  }
+  @media (max-width: 800px) {
+    .grid-5 { grid-template-columns: repeat(2, 1fr); }
+  }
+  @media (max-width: 560px) {
+    .grid-4 { grid-template-columns: 1fr; }
+    .grid-5 { grid-template-columns: 1fr; }
+  }
+
+  /* ===== Card base ===== */
+  .card {
+    background: var(--sc-panel);
+    border: 1px solid var(--sc-border);
+    padding: 20px;
+    position: relative;
+    transition: border-color 150ms ease,
+                box-shadow   200ms ease,
+                background   150ms ease;
+    overflow: hidden;
+  }
+  .card:hover {
+    border-color: var(--sc-green);
+    box-shadow: var(--sc-glow);
+    background: var(--sc-hover);
+  }
+  .card::before {
+    content: "";
+    position: absolute;
+    top: 0; left: 0;
+    width: 10px; height: 10px;
+    border-top:  1px solid var(--sc-text-dim);
+    border-left: 1px solid var(--sc-text-dim);
+    opacity: 0.6;
+    transition: border-color 150ms ease;
+  }
+  .card:hover::before { border-color: var(--sc-green); }
+  .card::after {
+    content: "";
+    position: absolute;
+    bottom: 0; right: 0;
+    width: 10px; height: 10px;
+    border-bottom: 1px solid var(--sc-text-dim);
+    border-right:  1px solid var(--sc-text-dim);
+    opacity: 0.6;
+    transition: border-color 150ms ease;
+  }
+  .card:hover::after { border-color: var(--sc-green); }
+
+  /* ===== Launcher cards ===== */
+  .launcher {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+    text-decoration: none;
+    color: inherit;
+    padding: 24px 16px;
+    min-height: 180px;
+  }
+  .launcher .icon-slot {
+    width: 56px; height: 56px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: var(--sc-green);
+    margin-bottom: 14px;
+    filter: drop-shadow(0 0 4px rgba(0, 255, 65, 0.3));
+  }
+  .launcher:hover .icon-slot {
+    filter: drop-shadow(0 0 8px rgba(0, 255, 65, 0.7));
+  }
+  .launcher .title {
+    font-family: "VT323", monospace;
+    font-size: 18px;
+    color: var(--sc-green);
+    letter-spacing: 2px;
+    margin-bottom: 6px;
+  }
+  .launcher .tagline {
+    font-size: 15px;
+    color: var(--sc-text-dim);
+    line-height: 1.3;
+  }
+
+  /* ===== Widget cards ===== */
+  .widget {
+    min-height: 180px;
+    display: flex;
+    flex-direction: column;
+  }
+  .widget .w-head {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding-bottom: 10px;
+    margin-bottom: 12px;
+    border-bottom: 1px solid var(--sc-border);
+  }
+  .widget .w-title {
+    font-family: "VT323", monospace;
+    font-size: 13px;
+    letter-spacing: 2px;
+    color: var(--sc-green);
+    text-transform: uppercase;
+  }
+  .widget .w-badge {
+    font-size: 12px;
+    color: var(--sc-text-ghost);
+    letter-spacing: 1px;
+  }
+  .widget .w-body {
+    flex: 1;
+    color: var(--sc-text);
+    font-size: 17px;
+    line-height: 1.4;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+  }
+  .widget .placeholder {
+    color: var(--sc-text-ghost);
+    font-size: 15px;
+    letter-spacing: 1px;
+  }
+  .widget .placeholder::before { content: "[ "; }
+  .widget .placeholder::after  { content: " ]"; }
+
+  /* Lower row — weather + calendar get taller cards */
+  .row-lower .widget { min-height: 280px; }
+
+  /* ===== Widget content — tarot / quote / word ===== */
+  .w-body { align-items: flex-start !important; justify-content: flex-start !important; }
+  .w-body .content {
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+  }
+  /* Tarot */
+  .tarot-name {
+    font-family: "VT323", monospace;
+    font-size: 17px;
+    color: var(--sc-green);
+    letter-spacing: 1.5px;
+    text-shadow: var(--sc-glow-soft);
+    text-align: center;
+    margin-top: 4px;
+  }
+  .tarot-read {
+    font-size: 16px;
+    color: var(--sc-text);
+    line-height: 1.4;
+    text-align: center;
+    margin-top: 6px;
+  }
+  .tarot-meaning {
+    font-size: 13px;
+    color: var(--sc-text-dim);
+    line-height: 1.3;
+    text-align: center;
+    margin-top: 8px;
+    padding-top: 8px;
+    border-top: 1px dashed var(--sc-border);
+    letter-spacing: 0.5px;
+  }
+  .tarot-meaning::before { content: "meaning // "; color: var(--sc-text-ghost); }
+  /* Source/attribution footer used on daily widgets */
+  .w-src {
+    font-size: 12px;
+    color: var(--sc-text-ghost);
+    letter-spacing: 1.5px;
+    margin-top: 10px;
+    padding-top: 8px;
+    border-top: 1px dashed var(--sc-border);
+    text-transform: uppercase;
+  }
+  .w-src::before { content: "src // "; color: var(--sc-green); }
+  /* Quote */
+  .quote-text {
+    font-size: 16px;
+    color: var(--sc-text);
+    line-height: 1.4;
+    font-style: italic;
+  }
+  .quote-text::before { content: "“ "; color: var(--sc-green); }
+  .quote-text::after  { content: " ”"; color: var(--sc-green); }
+  .quote-author {
+    font-size: 14px;
+    color: var(--sc-text-dim);
+    text-align: right;
+    letter-spacing: 1px;
+  }
+  .quote-author::before { content: "— "; }
+  /* Word */
+  .word-text {
+    font-family: "VT323", monospace;
+    font-size: 22px;
+    color: var(--sc-green);
+    letter-spacing: 2px;
+    text-shadow: var(--sc-glow-soft);
+  }
+  .word-pos {
+    font-size: 12px;
+    color: var(--sc-text-ghost);
+    letter-spacing: 2px;
+    text-transform: uppercase;
+  }
+  .word-def {
+    font-size: 15px;
+    color: var(--sc-text);
+    line-height: 1.35;
+  }
+  /* News */
+  .news-widget { min-height: 0; }
+  .news-widget .w-body { display: block; }
+  .news-item {
+    display: flex;
+    gap: 16px;
+    align-items: baseline;
+    padding: 10px 2px;
+    text-decoration: none;
+    color: inherit;
+    border-bottom: 1px dashed var(--sc-border);
+    transition: color 120ms ease, background 120ms ease;
+  }
+  .news-item:last-of-type { border-bottom: none; }
+  .news-item:hover {
+    background: var(--sc-hover);
+  }
+  .news-label {
+    font-size: 14px;
+    letter-spacing: 1.5px;
+    color: var(--sc-green);
+    text-transform: uppercase;
+    min-width: 170px;
+    flex-shrink: 0;
+    text-shadow: var(--sc-glow-soft);
+  }
+  .news-label::before { content: "[ "; color: var(--sc-text-ghost); }
+  .news-label::after  { content: " ]"; color: var(--sc-text-ghost); }
+  .news-title {
+    font-size: 16px;
+    color: var(--sc-text);
+    line-height: 1.3;
+  }
+  .news-item:hover .news-title { color: var(--sc-green); }
+  @media (max-width: 700px) {
+    .news-item { flex-direction: column; gap: 4px; }
+    .news-label { min-width: 0; }
+  }
+  /* Spotify */
+  .spotify-widget .w-body { display: block; }
+  .spotify-track {
+    display: flex;
+    gap: 14px;
+    align-items: center;
+    text-decoration: none;
+    color: inherit;
+    padding: 6px 0;
+    transition: opacity 120ms ease;
+  }
+  .spotify-track:hover { opacity: 0.9; }
+  .spotify-art {
+    width: 84px;
+    height: 84px;
+    border: 1px solid var(--sc-border);
+    flex-shrink: 0;
+    object-fit: cover;
+    transition: border-color 120ms ease, box-shadow 200ms ease;
+  }
+  .spotify-track:hover .spotify-art {
+    border-color: var(--sc-green);
+    box-shadow: var(--sc-glow);
+  }
+  .spotify-meta { flex: 1; min-width: 0; }
+  .spotify-title {
+    font-size: 18px;
+    color: var(--sc-green);
+    text-shadow: var(--sc-glow-soft);
+    margin-bottom: 4px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    letter-spacing: 1px;
+  }
+  .spotify-artist {
+    font-size: 15px;
+    color: var(--sc-text);
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+  .spotify-album {
+    font-size: 13px;
+    color: var(--sc-text-dim);
+    margin-top: 4px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+  .spotify-connect-wrap { text-align: center; padding: 10px 0; }
+  .spotify-connect {
+    background: transparent;
+    color: var(--sc-green);
+    border: 1px solid var(--sc-border);
+    padding: 10px 20px;
+    font-family: "VT323", monospace;
+    font-size: 16px;
+    letter-spacing: 2px;
+    cursor: pointer;
+    text-transform: uppercase;
+    transition: all 150ms ease;
+  }
+  .spotify-connect:hover {
+    border-color: var(--sc-green);
+    box-shadow: var(--sc-glow);
+    background: var(--sc-hover);
+  }
+  .spotify-hint {
+    font-size: 12px;
+    color: var(--sc-text-ghost);
+    margin-top: 10px;
+    letter-spacing: 1px;
+  }
+
+  /* ===== Footer ===== */
+  footer {
+    margin-top: 40px;
+    padding-top: 18px;
+    border-top: 1px solid var(--sc-border);
+    text-align: center;
+    font-size: 13px;
+    color: var(--sc-text-ghost);
+    letter-spacing: 2px;
+  }
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <header>
+    <div class="greeting">
+      <span id="greeting">boot sequence</span><span class="cursor"></span>
+    </div>
+    <div class="clock">
+      <span id="date">—</span>
+      <span class="sep">::</span>
+      <span id="time">—</span>
+    </div>
+  </header>
+
+  <!-- ===== ROW 1 — launchers ===== -->
+  <div class="row-label">PROJECTS</div>
+  <section class="grid-5">
+
+    <a class="card launcher" href="https://github.com">
+      <span class="icon-slot" aria-hidden="true">
+        <!-- sunburst / radiating phosphor -->
+        <svg width="48" height="48" viewBox="0 0 48 48" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round">
+          <circle cx="24" cy="24" r="7"/>
+          <g stroke-width="1.8">
+            <line x1="24" y1="2"  x2="24" y2="10"/>
+            <line x1="24" y1="38" x2="24" y2="46"/>
+            <line x1="2"  y1="24" x2="10" y2="24"/>
+            <line x1="38" y1="24" x2="46" y2="24"/>
+            <line x1="8"  y1="8"  x2="14" y2="14"/>
+            <line x1="34" y1="34" x2="40" y2="40"/>
+            <line x1="40" y1="8"  x2="34" y2="14"/>
+            <line x1="14" y1="34" x2="8"  y2="40"/>
+          </g>
+        </svg>
+      </span>
+      <div class="title">GITHUB</div>
+      <div class="tagline">repositories</div>
+    </a>
+
+    <a class="card launcher" href="https://devdocs.io">
+      <span class="icon-slot" aria-hidden="true">
+        <!-- minimal cart -->
+        <svg width="48" height="48" viewBox="0 0 48 48" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M6 8 H12 L16 30 H38 L42 14 H14"/>
+          <circle cx="18" cy="40" r="3"/>
+          <circle cx="36" cy="40" r="3"/>
+        </svg>
+      </span>
+      <div class="title">DEVDOCS</div>
+      <div class="tagline">API reference</div>
+    </a>
+
+    <a class="card launcher" href="https://example.com">
+      <span class="icon-slot" aria-hidden="true">
+        <!-- stepped habit graph -->
+        <svg width="48" height="48" viewBox="0 0 48 48" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <polyline points="4,40 4,32 12,32 12,22 20,22 20,12 28,12 28,20 36,20 36,8 44,8 44,40"/>
+          <line x1="4" y1="44" x2="44" y2="44"/>
+        </svg>
+      </span>
+      <div class="title">HABITS</div>
+      <div class="tagline">habit tracker</div>
+    </a>
+
+    <a class="card launcher" href="https://time.is">
+      <span class="icon-slot" aria-hidden="true">
+        <!-- analog clock -->
+        <svg width="48" height="48" viewBox="0 0 48 48" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round">
+          <circle cx="24" cy="24" r="20"/>
+          <line x1="24" y1="24" x2="24" y2="10"/>
+          <line x1="24" y1="24" x2="34" y2="28"/>
+          <line x1="24" y1="4" x2="24" y2="7"/>
+          <line x1="24" y1="41" x2="24" y2="44"/>
+          <line x1="4" y1="24" x2="7" y2="24"/>
+          <line x1="41" y1="24" x2="44" y2="24"/>
+        </svg>
+      </span>
+      <div class="title">CLOCK</div>
+      <div class="tagline">world clock</div>
+    </a>
+
+    <a class="card launcher" href="https://claude.ai">
+      <span class="icon-slot" aria-hidden="true">
+        <!-- claude: 8-point radial spark, nods to Anthropic's mark without copying -->
+        <svg width="48" height="48" viewBox="0 0 48 48" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round">
+          <g stroke-width="2.2">
+            <!-- four long cardinal rays -->
+            <line x1="24" y1="4"  x2="24" y2="18"/>
+            <line x1="24" y1="30" x2="24" y2="44"/>
+            <line x1="4"  y1="24" x2="18" y2="24"/>
+            <line x1="30" y1="24" x2="44" y2="24"/>
+          </g>
+          <g stroke-width="1.6">
+            <!-- four shorter diagonal rays -->
+            <line x1="10" y1="10" x2="18" y2="18"/>
+            <line x1="30" y1="30" x2="38" y2="38"/>
+            <line x1="38" y1="10" x2="30" y2="18"/>
+            <line x1="18" y1="30" x2="10" y2="38"/>
+          </g>
+          <!-- tight center dot -->
+          <circle cx="24" cy="24" r="2" fill="currentColor"/>
+        </svg>
+      </span>
+      <div class="title">CLAUDE</div>
+      <div class="tagline">anthropic // opus</div>
+    </a>
+
+  </section>
+
+  <!-- ===== ROW 2 — daily widgets ===== -->
+  <div class="row-label">DAILY</div>
+  <section class="grid-3">
+
+
+    <article class="card widget">
+      <div class="w-head">
+        <div class="w-title">TAROT</div>
+        <div class="w-badge" id="tarot-badge">DAILY PULL</div>
+      </div>
+      <div class="w-body" id="tarot-body"><span class="placeholder">awaiting transmission</span></div>
+    </article>
+
+    <article class="card widget">
+      <div class="w-head">
+        <div class="w-title">QUOTE</div>
+        <div class="w-badge" id="quote-badge">OF THE DAY</div>
+      </div>
+      <div class="w-body" id="quote-body"><span class="placeholder">awaiting transmission</span></div>
+    </article>
+
+    <article class="card widget">
+      <div class="w-head">
+        <div class="w-title">WORD</div>
+        <div class="w-badge" id="word-badge">OF THE DAY</div>
+      </div>
+      <div class="w-body" id="word-body"><span class="placeholder">awaiting transmission</span></div>
+    </article>
+
+  </section>
+
+  <!-- ===== ROW 3 — news feed + spotify ===== -->
+  <div class="row-label">FEED</div>
+  <section class="grid-2">
+    <article class="card widget news-widget">
+      <div class="w-head">
+        <div class="w-title">NEWS</div>
+        <div class="w-badge" id="news-badge">TOP 3</div>
+      </div>
+      <div class="w-body" id="news-body"><span class="placeholder">awaiting feed</span></div>
+    </article>
+    <article class="card widget spotify-widget">
+      <div class="w-head">
+        <div class="w-title">SPOTIFY</div>
+        <div class="w-badge" id="spotify-badge">TODAY'S PICK</div>
+      </div>
+      <div class="w-body" id="spotify-body"><span class="placeholder">not connected</span></div>
+    </article>
+  </section>
+
+  <!-- ===== ROW 4 — weather + calendar ===== -->
+  <div class="row-label">SIGNALS</div>
+  <section class="grid-2 row-lower">
+
+    <article class="card widget">
+      <div class="w-head">
+        <div class="w-title">WEATHER</div>
+        <div class="w-badge" id="weather-badge">LOCAL // 7-DAY</div>
+      </div>
+      <div class="w-body"><span class="placeholder">awaiting feed</span></div>
+    </article>
+
+    <article class="card widget">
+      <div class="w-head">
+        <div class="w-title">CALENDAR</div>
+        <div class="w-badge">UPCOMING</div>
+      </div>
+      <div class="w-body"><span class="placeholder">awaiting feed</span></div>
+    </article>
+
+  </section>
+
+  <footer>HOME // <span id="hostline">localhost</span> // phase 01 // shell</footer>
+
+</div>
+
+<script src="config.js"></script>
+<script>
+  // ===== Time-of-day greeting + clock =====
+  // Matches GRTA mood schedule: dawn / morning / afternoon / evening / night
+  const pad = n => String(n).padStart(2, "0");
+
+  const CFG = window.HOME_CONFIG || {};
+  const USER = CFG.name || "operator";
+
+  function greetingFor(h) {
+    if (h >= 5  && h < 12) return "good morning, " + USER;
+    if (h >= 12 && h < 18) return "good afternoon, " + USER;
+    if (h >= 18 && h < 22) return "good evening, " + USER;
+    return "night shift, " + USER;
+  }
+
+  // Launcher cards and badges from config.js (missing entries keep the markup defaults).
+  document.querySelectorAll(".card.launcher").forEach((card, i) => {
+    const l = (CFG.launchers || [])[i];
+    if (!l) return;
+    if (l.href) card.href = l.href;
+    if (l.title) card.querySelector(".title").textContent = l.title;
+    if (l.tagline) card.querySelector(".tagline").textContent = l.tagline;
+  });
+  if (CFG.weatherLabel) document.getElementById("weather-badge").textContent = CFG.weatherLabel;
+
+  function render() {
+    const d = new Date();
+    document.getElementById("greeting").textContent = greetingFor(d.getHours());
+    document.getElementById("date").textContent =
+      d.toLocaleDateString(undefined, { weekday: "short", month: "short", day: "numeric" }).toUpperCase();
+    // Include the timezone abbreviation so the spoofed-tz case is visible.
+    // If RFP is still clamping us to UTC, this reads "UTC" or nothing.
+    const tz = (() => {
+      try {
+        const m = d.toLocaleString("en-US", { timeZoneName: "short" }).match(/\b([A-Z]{2,5})$/);
+        return m ? m[1] : "";
+      } catch (_) { return ""; }
+    })();
+    document.getElementById("time").textContent =
+      pad(d.getHours()) + ":" + pad(d.getMinutes()) + ":" + pad(d.getSeconds()) +
+      (tz ? " " + tz : "");
+  }
+  render();
+  setInterval(render, 1000);
+</script>
+
+<script>
+/* ==== Phase 2 data: tarot deck + quote fallback + word bank ==== */
+
+const TAROT_DECK = [
+  // Major Arcana — r = today's energy read
+  { n: "0 — The Fool",            m: "New beginnings, leap of faith, innocence, spontaneity.",      r: "Say yes to the thing that scares you a little. The jump is the point — no one ever felt ready." },
+  { n: "I — The Magician",        m: "Manifestation, resourcefulness, willpower, focused action.",  r: "You already have every tool you need. Stop collecting and start building." },
+  { n: "II — The High Priestess", m: "Intuition, sacred knowledge, the unconscious mind, stillness.",r: "The answer is quieter than the noise. Sit with the question before reaching for the inbox." },
+  { n: "III — The Empress",       m: "Femininity, beauty, nature, abundance, nurture.",             r: "Nurture the thing you've been neglecting — the project, the person, the self. Today it grows." },
+  { n: "IV — The Emperor",        m: "Authority, structure, control, stable foundation.",           r: "Structure beats willpower. Build the framework today, work inside it tomorrow." },
+  { n: "V — The Hierophant",      m: "Tradition, spiritual wisdom, conformity, mentorship.",        r: "Someone has already solved this problem. Find them, read them, borrow the playbook." },
+  { n: "VI — The Lovers",         m: "Love, harmony, partnerships, alignment of values.",           r: "A choice today aligns you with what matters. Pick the option your values endorse, not the one that's easier." },
+  { n: "VII — The Chariot",       m: "Control, willpower, determination, victory through discipline.",r: "Two forces pulling opposite ways — hold the reins on both. Discipline is the only vehicle forward." },
+  { n: "VIII — Strength",         m: "Courage, inner strength, compassion, soft persuasion.",       r: "Soft hand, firm resolve. You don't have to win the argument to hold the ground." },
+  { n: "IX — The Hermit",         m: "Soul-searching, introspection, solitude, inner guidance.",    r: "Pull back from the group chat today. The signal you need comes in silence." },
+  { n: "X — Wheel of Fortune",    m: "Cycles, turning points, destiny, good luck.",                 r: "Something's turning in your favor — don't muscle it, ride it. Notice which door just opened." },
+  { n: "XI — Justice",            m: "Fairness, truth, cause and effect, accountability.",          r: "A ledger's about to balance. Tell the truth, own the share that's yours, and let the rest go." },
+  { n: "XII — The Hanged Man",    m: "Pause, surrender, new perspective, letting go.",              r: "You're stuck because you're pushing. Let go for a minute and the view flips." },
+  { n: "XIII — Death",            m: "Endings, transformation, transition, release.",               r: "Something wants to end today. Don't prop it up out of nostalgia — compost it." },
+  { n: "XIV — Temperance",        m: "Balance, moderation, patience, purposeful blending.",         r: "The sustainable pace wins today. Not the sprint, not the crawl — the walk you can keep." },
+  { n: "XV — The Devil",          m: "Shadow self, attachment, addiction, self-imposed limits.",    r: "A habit's running the show. Look it dead in the eye — most of its power dies in the looking." },
+  { n: "XVI — The Tower",         m: "Sudden upheaval, revelation, collapse of false structure.",   r: "If something falls today, it was already hollow. Clear the rubble — don't rebuild the same thing." },
+  { n: "XVII — The Star",         m: "Hope, faith, renewal, serenity, inspiration.",                r: "After a rough stretch, a clear sky. Let yourself believe in the next thing you're making." },
+  { n: "XVIII — The Moon",        m: "Illusion, intuition, fear surfacing, the subconscious.",      r: "Not everything you're feeling is real — but not everything you're feeling is wrong. Name which is which." },
+  { n: "XIX — The Sun",           m: "Joy, success, vitality, positivity, clarity.",                r: "Today is good on purpose. Don't earn it, don't over-explain it — just be in it." },
+  { n: "XX — Judgement",          m: "Reckoning, inner calling, rebirth, absolution.",              r: "A call is coming through — from your past, your gut, or a version of yourself you left behind. Answer it." },
+  { n: "XXI — The World",         m: "Completion, integration, accomplishment, wholeness.",         r: "You're closer to done than you think. Finish the last 10% today — don't start a new chapter mid-sentence." },
+  // Wands — fire, passion, creative energy
+  { n: "Ace of Wands",    m: "Spark of inspiration, new creative energy, opportunity.",             r: "An idea just lit up — protect it for thirty minutes before you pitch, share, or evaluate it." },
+  { n: "Two of Wands",    m: "Future planning, decision to expand, bold vision.",                   r: "Zoom out. The six-month view makes today's tradeoff obvious." },
+  { n: "Three of Wands",  m: "Foresight, progress, ships coming in.",                               r: "The work you shipped earlier is starting to return value. Watch for signals — follow the warm ones." },
+  { n: "Four of Wands",   m: "Celebration, home, belonging, milestones.",                           r: "A milestone earned, even if small — mark it out loud. Unacknowledged wins atrophy." },
+  { n: "Five of Wands",   m: "Friction, competition, scrappy disagreement.",                        r: "Friction today is a sign people care. Don't smooth it too early — the heat is making the shape." },
+  { n: "Six of Wands",    m: "Public recognition, victory, confidence affirmed.",                   r: "You're being seen. Accept the credit without deflecting — then get back to the next thing." },
+  { n: "Seven of Wands",  m: "Defending your ground, perseverance, conviction.",                    r: "Hold the line on the standard. If you lower it today, you'll be defending the lower one tomorrow." },
+  { n: "Eight of Wands",  m: "Swift motion, news arriving, rapid progress.",                        r: "Things speed up today. Inbox is active — check it with intention, not anxiety." },
+  { n: "Nine of Wands",   m: "Resilience, last stand, stamina under pressure.",                     r: "You're tired, you're close. Not 'push through' — just one more honest round, then rest on purpose." },
+  { n: "Ten of Wands",    m: "Overburden, responsibility, carrying too much.",                      r: "The load is too heavy because some of it isn't yours. Put down what you picked up for someone else." },
+  { n: "Page of Wands",   m: "Discovery, enthusiasm, exploration of what's new.",                   r: "A beginner's curiosity today. Poke the thing you don't fully understand — the reps compound fast." },
+  { n: "Knight of Wands", m: "Adventure, impulsive drive, passionate movement.",                    r: "Momentum is a gift but a poor strategist. Go fast on the right thing — pause to check that twice." },
+  { n: "Queen of Wands",  m: "Warmth, confidence, magnetic presence.",                              r: "Bring the warmth today, not the heat. Your presence does more than your pitch." },
+  { n: "King of Wands",   m: "Visionary leader, entrepreneurial fire, honor.",                      r: "Lead by pointing at the thing, not by pulling people toward it. The vision is the work." },
+  // Cups — water, emotion, relationships
+  { n: "Ace of Cups",     m: "New feelings, emotional opening, intuitive flow.",                    r: "Feelings are data. Something opened up — notice what, without rushing to respond." },
+  { n: "Two of Cups",     m: "Mutual attraction, partnership, deep rapport.",                       r: "A relationship that matters needs ten minutes of real attention today. Make it." },
+  { n: "Three of Cups",   m: "Friendship, celebration, community joy.",                             r: "The work is better when you share it. Text the friend, send the picture, include someone in." },
+  { n: "Four of Cups",    m: "Apathy, turning inward, missing what's offered.",                     r: "Something good is being offered while you're looking past it. Look up." },
+  { n: "Five of Cups",    m: "Grief, regret, but two cups remain standing.",                        r: "It's OK to mourn what didn't work. It's also OK to pick up what still does — two cups are standing." },
+  { n: "Six of Cups",     m: "Nostalgia, childhood memory, old friendships.",                       r: "Something from before is useful again. Reach back — old tool, old friend, old note — bring it forward." },
+  { n: "Seven of Cups",   m: "Many options, illusion, need to choose.",                             r: "Too many tabs open, literal and figurative. Close six. The right one becomes obvious." },
+  { n: "Eight of Cups",   m: "Walking away from what no longer nourishes.",                         r: "You've outgrown something — a tool, a role, a rhythm. Walking away today isn't quitting, it's honesty." },
+  { n: "Nine of Cups",    m: "Contentment, wish fulfilled, gratitude.",                             r: "You have more than you're letting yourself notice. Five minutes of gratitude, specific, written down." },
+  { n: "Ten of Cups",     m: "Emotional harmony, family, belonging fulfilled.",                     r: "Belonging isn't found, it's made. Tend the people you're already chosen by." },
+  { n: "Page of Cups",    m: "Creative message, tender intuition, surprise feeling.",               r: "A surprising feeling shows up — receive it without immediately analyzing it. The message is in the feeling." },
+  { n: "Knight of Cups",  m: "Romance, imagination in motion, following the heart.",                r: "Make the romantic gesture today — in love, in craft, in how you open the email. The flourish is the point." },
+  { n: "Queen of Cups",   m: "Compassion, emotional wisdom, gentle holding.",                       r: "Be the calm one today. Not the fixer — the one who makes space for someone else to find their own footing." },
+  { n: "King of Cups",    m: "Emotional balance, calm under pressure, diplomat.",                   r: "Respond, don't react. The pause before your reply is where your power is today." },
+  // Swords — air, mind, conflict
+  { n: "Ace of Swords",   m: "Breakthrough, clarity, cutting through confusion.",                   r: "A clear thought cuts through a week of fog today. Write it down the second it lands." },
+  { n: "Two of Swords",   m: "Stalemate, blocked, decision avoided.",                               r: "You already know. The only thing missing is your willingness to admit it. Decide by sundown." },
+  { n: "Three of Swords", m: "Heartbreak, grief, necessary wounding.",                              r: "A truth will sting today — don't numb it, don't perform it. Let it do its work and pass through." },
+  { n: "Four of Swords",  m: "Rest, recovery, retreat to recharge.",                                r: "Rest is the work today. Nap, walk, log off. Guilt about stopping is a cognitive bug, not a signal." },
+  { n: "Five of Swords",  m: "Hollow victory, conflict's cost, tension.",                           r: "Winning the argument isn't free. Ask if the cost is worth the point you're trying to make." },
+  { n: "Six of Swords",   m: "Transition, moving to calmer waters.",                                r: "You're mid-crossing. The old shore is gone, the new one isn't clear yet — that's fine, just keep rowing." },
+  { n: "Seven of Swords", m: "Strategy, stealth, risky tactics.",                                   r: "Not every move needs to be announced. Do the quiet work today; the loud one can come later." },
+  { n: "Eight of Swords", m: "Self-imposed trap, perceived restriction.",                           r: "The rope isn't tied. Three of the constraints you think you have, you can just walk out of." },
+  { n: "Nine of Swords",  m: "Night anxiety, worry loops, dread.",                                  r: "The 3am version of the problem is lying to you. Wait until you've had coffee before you believe it." },
+  { n: "Ten of Swords",   m: "Rock bottom — after this, only up.",                                  r: "Something's hit its floor. Good news: there's nothing left to lose on this front. Build back clean." },
+  { n: "Page of Swords",  m: "Curiosity, mental energy, restless learner.",                         r: "Chase the curiosity today. Rabbit hole for an hour — you'll find something you needed." },
+  { n: "Knight of Swords",m: "Charge, conviction, direct action.",                                  r: "Go direct today. Skip the five-paragraph preamble, say the thing in one sentence, send it." },
+  { n: "Queen of Swords", m: "Clear-eyed, independent, unsentimental truth.",                       r: "Warm heart, cold eye. You can care deeply about the person and still tell them the truth." },
+  { n: "King of Swords",  m: "Intellectual authority, ethical reasoning.",                          r: "Be the adult in the room. Calm logic. The feelings are real; the decision is still yours to make clearly." },
+  // Pentacles — earth, material, body, work
+  { n: "Ace of Pentacles",   m: "New material opportunity, stable ground, seed money.",             r: "A real opportunity with real mechanics today — not a pitch, not a dream. Investigate the actual numbers." },
+  { n: "Two of Pentacles",   m: "Juggling, adaptability, flux with rhythm.",                        r: "Multiple plates up is fine; just don't pretend they're all equally important. Rank them, then juggle." },
+  { n: "Three of Pentacles", m: "Collaboration, skill-building, craft mastery.",                    r: "Someone can help you today. Not 'save you' — pair with you. Ask." },
+  { n: "Four of Pentacles",  m: "Security, holding tight, conserving resources.",                   r: "Holding on tight is how you crush what you're protecting. Loosen the grip — it stays." },
+  { n: "Five of Pentacles",  m: "Scarcity felt, help available if you look up.",                    r: "You feel low on something — money, energy, attention. Check what's actually there before spiraling." },
+  { n: "Six of Pentacles",   m: "Generosity, balanced giving and receiving.",                       r: "Give something today — help, money, time, a real compliment. And notice if you can accept one back." },
+  { n: "Seven of Pentacles", m: "Patience, the long game, sustainable growth.",                     r: "The work is growing even when you don't see it. Check in, don't uproot. Water and wait." },
+  { n: "Eight of Pentacles", m: "Apprenticeship, deep practice, craftsmanship.",                    r: "Reps today. Same motion, slightly better, lots of times. Mastery is boring on purpose." },
+  { n: "Nine of Pentacles",  m: "Abundance earned, self-sufficiency, elegance.",                    r: "Look at what you've built. Seriously — stop for five minutes and see it. That's real." },
+  { n: "Ten of Pentacles",   m: "Legacy, generational wealth, rooted family.",                      r: "Think in decades today, not quarters. What's the version of this that outlives you?" },
+  { n: "Page of Pentacles",  m: "Goal-setting, study, new venture plotted.",                        r: "Pick one goal and write the first three concrete steps. Not ten. Three." },
+  { n: "Knight of Pentacles",m: "Steady work, reliability, unglamorous progress.",                  r: "Boring is the strategy today. Show up, do the thing, log it, close the laptop. Consistency is the edge." },
+  { n: "Queen of Pentacles", m: "Nurturing, resourceful, rooted in the real.",                      r: "Tend the physical environment today — the desk, the pantry, the body. The mind follows the space." },
+  { n: "King of Pentacles",  m: "Prosperity, provider, material mastery.",                          r: "You have more leverage than you're using. Invest something — time, capital, attention — with intent, not fear." }
+];
+
+const QUOTES_LOCAL = [
+  { q: "The obstacle is the way.", a: "Marcus Aurelius" },
+  { q: "The cave you fear to enter holds the treasure you seek.", a: "Joseph Campbell" },
+  { q: "Simplicity is the ultimate sophistication.", a: "Leonardo da Vinci" },
+  { q: "The only way to do great work is to love what you do.", a: "Steve Jobs" },
+  { q: "Do not go where the path may lead, go instead where there is no path and leave a trail.", a: "Ralph Waldo Emerson" },
+  { q: "It always seems impossible until it's done.", a: "Nelson Mandela" },
+  { q: "Whether you think you can or think you can't, you're right.", a: "Henry Ford" },
+  { q: "The future depends on what you do today.", a: "Mahatma Gandhi" },
+  { q: "Quality is not an act, it is a habit.", a: "Aristotle" },
+  { q: "First, solve the problem. Then, write the code.", a: "John Johnson" },
+  { q: "Premature optimization is the root of all evil.", a: "Donald Knuth" },
+  { q: "Talk is cheap. Show me the code.", a: "Linus Torvalds" },
+  { q: "Any sufficiently advanced technology is indistinguishable from magic.", a: "Arthur C. Clarke" },
+  { q: "The best way to predict the future is to invent it.", a: "Alan Kay" },
+  { q: "Make it work, make it right, make it fast.", a: "Kent Beck" },
+  { q: "Programs must be written for people to read, and only incidentally for machines to execute.", a: "Harold Abelson" },
+  { q: "Walk as if you are kissing the Earth with your feet.", a: "Thich Nhat Hanh" },
+  { q: "Wherever you are, be all there.", a: "Jim Elliot" },
+  { q: "The present moment is the only moment available to us, and it is the door to all moments.", a: "Thich Nhat Hanh" },
+  { q: "When you know yourself, you are empowered. When you accept yourself, you are invincible.", a: "Tina Lifford" },
+  { q: "He who is not busy being born is busy dying.", a: "Bob Dylan" },
+  { q: "We are what we pretend to be, so we must be careful about what we pretend to be.", a: "Kurt Vonnegut" },
+  { q: "Stay hungry, stay foolish.", a: "Stewart Brand" },
+  { q: "Discipline equals freedom.", a: "Jocko Willink" },
+  { q: "Amateurs sit and wait for inspiration. The rest of us just get up and go to work.", a: "Stephen King" },
+  { q: "The price of anything is the amount of life you exchange for it.", a: "Henry David Thoreau" },
+  { q: "The scariest moment is always just before you start.", a: "Stephen King" },
+  { q: "You miss 100% of the shots you don't take.", a: "Wayne Gretzky" },
+  { q: "Fall seven times, stand up eight.", a: "Japanese Proverb" },
+  { q: "The mind is everything. What you think you become.", a: "Buddha" },
+  { q: "Act as if what you do makes a difference. It does.", a: "William James" },
+  { q: "The journey of a thousand miles begins with a single step.", a: "Lao Tzu" },
+  { q: "He who has a why to live can bear almost any how.", a: "Friedrich Nietzsche" },
+  { q: "Do what you can, with what you have, where you are.", a: "Theodore Roosevelt" },
+  { q: "The unexamined life is not worth living.", a: "Socrates" },
+  { q: "Be the change you wish to see in the world.", a: "Mahatma Gandhi" },
+  { q: "I think, therefore I am.", a: "René Descartes" },
+  { q: "Happiness is not something ready-made. It comes from your own actions.", a: "Dalai Lama" },
+  { q: "The greatest glory in living lies not in never falling, but in rising every time we fall.", a: "Nelson Mandela" },
+  { q: "Well done is better than well said.", a: "Benjamin Franklin" },
+  { q: "What lies behind us and what lies before us are tiny matters compared to what lies within us.", a: "Ralph Waldo Emerson" },
+  { q: "Success is not final, failure is not fatal: it is the courage to continue that counts.", a: "Winston Churchill" },
+  { q: "Life is what happens to you while you're busy making other plans.", a: "John Lennon" },
+  { q: "Everything you can imagine is real.", a: "Pablo Picasso" },
+  { q: "You must be the change you wish to see in the world.", a: "Mahatma Gandhi" },
+  { q: "The best time to plant a tree was 20 years ago. The second best time is now.", a: "Chinese Proverb" },
+  { q: "It is never too late to be what you might have been.", a: "George Eliot" },
+  { q: "The only impossible journey is the one you never begin.", a: "Tony Robbins" },
+  { q: "Your time is limited, don't waste it living someone else's life.", a: "Steve Jobs" },
+  { q: "The harder you work for something, the greater you'll feel when you achieve it.", a: "Anonymous" },
+  { q: "Be yourself; everyone else is already taken.", a: "Oscar Wilde" },
+  { q: "An unexamined life is not worth living.", a: "Socrates" },
+  { q: "Turn your wounds into wisdom.", a: "Oprah Winfrey" },
+  { q: "The man who moves a mountain begins by carrying away small stones.", a: "Confucius" }
+];
+
+const WORDS = [
+  { w: "petrichor",     p: "noun",      d: "The pleasant smell of earth after rain on dry soil." },
+  { w: "susurrus",      p: "noun",      d: "A soft whispering or rustling sound." },
+  { w: "sillage",       p: "noun",      d: "The scent that lingers in the air after someone has passed through." },
+  { w: "limerence",     p: "noun",      d: "The state of being infatuated with another person." },
+  { w: "saudade",       p: "noun",      d: "A deep emotional longing for an absent something or someone." },
+  { w: "hiraeth",       p: "noun",      d: "A homesickness for a home you cannot return to, or that never was." },
+  { w: "numinous",      p: "adjective", d: "Having a strong spiritual or religious quality; mysterious." },
+  { w: "ineffable",     p: "adjective", d: "Too great or extreme to be expressed in words." },
+  { w: "mellifluous",   p: "adjective", d: "Sweet or musical; pleasant to hear." },
+  { w: "ephemeral",     p: "adjective", d: "Lasting for a very short time." },
+  { w: "defenestrate",  p: "verb",      d: "To throw someone or something out of a window." },
+  { w: "sonorous",      p: "adjective", d: "Imposingly deep and full; resonant." },
+  { w: "halcyon",       p: "adjective", d: "Denoting a period of time in the past that was idyllically happy." },
+  { w: "lugubrious",    p: "adjective", d: "Looking or sounding sad and dismal." },
+  { w: "phosphene",     p: "noun",      d: "A ring or spot of light produced by pressure on the eyeball or direct stimulation of the visual system." },
+  { w: "gossamer",      p: "adjective", d: "Light, thin, and insubstantial or delicate." },
+  { w: "serendipity",   p: "noun",      d: "The occurrence of events by chance in a happy or beneficial way." },
+  { w: "denouement",    p: "noun",      d: "The final part of a narrative where strands of the plot are resolved." },
+  { w: "ephemera",      p: "noun",      d: "Things that exist or are used for only a short time." },
+  { w: "quixotic",      p: "adjective", d: "Exceedingly idealistic; unrealistic and impractical." },
+  { w: "perspicacious", p: "adjective", d: "Having a ready insight into and understanding of things." },
+  { w: "surreptitious", p: "adjective", d: "Kept secret, especially because it would not be approved of." },
+  { w: "obfuscate",     p: "verb",      d: "To render obscure, unclear, or unintelligible." },
+  { w: "palimpsest",    p: "noun",      d: "Something reused or altered but still bearing visible traces of its earlier form." },
+  { w: "zephyr",        p: "noun",      d: "A soft, gentle breeze." },
+  { w: "nadir",         p: "noun",      d: "The lowest or most unsuccessful point in a situation." },
+  { w: "zenith",        p: "noun",      d: "The time at which something is most powerful or successful." },
+  { w: "liminal",       p: "adjective", d: "Relating to a transitional or initial stage; occupying a position at a boundary." },
+  { w: "apricity",      p: "noun",      d: "The warmth of the sun in winter." },
+  { w: "clinquant",     p: "adjective", d: "Glittering with gold or tinsel; showy." },
+  { w: "crepuscular",   p: "adjective", d: "Of, resembling, or relating to twilight." },
+  { w: "defervescence", p: "noun",      d: "The reduction of a fever; the cooling down." },
+  { w: "eudaimonia",    p: "noun",      d: "The contented state of being happy, healthy, and prosperous." },
+  { w: "flaneur",       p: "noun",      d: "One who strolls around aimlessly but enjoyably, observing life and the city." },
+  { w: "gallivant",     p: "verb",      d: "Go around from one place to another in pursuit of pleasure or entertainment." },
+  { w: "incandescent",  p: "adjective", d: "Emitting light as a result of being heated; passionately emotional." },
+  { w: "juxtapose",     p: "verb",      d: "Place close together for contrasting effect." },
+  { w: "laconic",       p: "adjective", d: "Using few words; expressing much in few words." },
+  { w: "myriad",        p: "noun",      d: "A countless or extremely great number." },
+  { w: "nemophilist",   p: "noun",      d: "One who loves the forest and its beauty and solitude." },
+  { w: "obdurate",      p: "adjective", d: "Stubbornly refusing to change one's opinion or course of action." },
+  { w: "pellucid",      p: "adjective", d: "Translucently clear; easily understood." },
+  { w: "querulous",     p: "adjective", d: "Complaining in a petulant or whining manner." },
+  { w: "redolent",      p: "adjective", d: "Strongly reminiscent or suggestive of; fragrant." },
+  { w: "sempiternal",   p: "adjective", d: "Everlasting; eternal." },
+  { w: "taciturn",      p: "adjective", d: "Reserved or uncommunicative in speech; saying little." },
+  { w: "ubiquitous",    p: "adjective", d: "Present, appearing, or found everywhere." },
+  { w: "winsome",       p: "adjective", d: "Attractive or appealing in appearance or character." },
+  { w: "xenial",        p: "adjective", d: "Hospitable, especially to visiting strangers or foreigners." },
+  { w: "yonder",        p: "adverb",    d: "At some distance in the direction indicated; over there." },
+  { w: "zugzwang",      p: "noun",      d: "A position in which any move made worsens the situation; a dilemma." },
+  { w: "eloquent",      p: "adjective", d: "Fluent or persuasive in speaking or writing." },
+  { w: "fecund",        p: "adjective", d: "Producing or capable of producing an abundance of offspring or new growth." },
+  { w: "harbinger",     p: "noun",      d: "A person or thing that announces or signals the approach of another." },
+  { w: "incipient",     p: "adjective", d: "Beginning to happen or develop." },
+  { w: "jocund",        p: "adjective", d: "Cheerful and lighthearted." },
+  { w: "kairos",        p: "noun",      d: "The right, critical, or opportune moment." }
+];
+
+/* ==== Helpers ==== */
+function dayOfYear(d) {
+  const start = new Date(d.getFullYear(), 0, 0);
+  const diff = d - start + ((start.getTimezoneOffset() - d.getTimezoneOffset()) * 60 * 1000);
+  // +1 offset compensates for resistFingerprinting reporting UTC, which made
+  // evening views show the next day's content. Each day still advances by 1;
+  // only the starting alignment moves.
+  return Math.floor(diff / 86400000) + 1;
+}
+function daySeed(d) {
+  return d.getFullYear() * 1000 + dayOfYear(d);
+}
+function todayKey() {
+  const d = new Date();
+  return `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`;
+}
+
+/* localStorage cache with TTL (ms). */
+const CACHE = {
+  get(key) {
+    try {
+      const raw = localStorage.getItem("home.cache." + key);
+      if (!raw) return null;
+      const { exp, val } = JSON.parse(raw);
+      if (Date.now() > exp) return null;
+      return val;
+    } catch (_) { return null; }
+  },
+  /* Stale-read: return cached value ignoring expiry, plus age in ms.
+     Used to fall back on stale data when a fetch fails. */
+  getStale(key) {
+    try {
+      const raw = localStorage.getItem("home.cache." + key);
+      if (!raw) return null;
+      const { exp, val } = JSON.parse(raw);
+      return { val, ageMs: Date.now() - (exp - /*written-ttl unknown*/ 0) };
+    } catch (_) { return null; }
+  },
+  set(key, val, ttlMs) {
+    try {
+      localStorage.setItem("home.cache." + key,
+        JSON.stringify({ exp: Date.now() + ttlMs, val, storedAt: Date.now() }));
+    } catch (_) {}
+  }
+};
+
+/* Minimal HTML-escape for user-controlled strings (news titles). */
+function escHtml(s) {
+  return String(s).replace(/[&<>"']/g, ch =>
+    ({ "&":"&amp;", "<":"&lt;", ">":"&gt;", '"':"&quot;", "'":"&#39;" }[ch]));
+}
+
+/* ==== Renderers ==== */
+function renderTarot() {
+  const card = TAROT_DECK[daySeed(new Date()) % TAROT_DECK.length];
+  const body = document.getElementById("tarot-body");
+  body.innerHTML = `
+    <div class="content">
+      <div class="tarot-name">${card.n}</div>
+      <div class="tarot-read">${card.r}</div>
+      <div class="tarot-meaning">${card.m}</div>
+    </div>`;
+}
+
+function renderLocalQuote() {
+  const q = QUOTES_LOCAL[dayOfYear(new Date()) % QUOTES_LOCAL.length];
+  const body = document.getElementById("quote-body");
+  body.innerHTML = `
+    <div class="content">
+      <div class="quote-text">${q.q}</div>
+      <div class="quote-author">${q.a}</div>
+    </div>`;
+  document.getElementById("quote-badge").textContent = "OF THE DAY";
+}
+
+async function renderQuote() {
+  // Try cache first — 24h TTL, keyed by today so new day forces fresh fetch.
+  const cacheKey = "quote." + todayKey();
+  const cached = CACHE.get(cacheKey);
+  if (cached) {
+    const body = document.getElementById("quote-body");
+    body.innerHTML = `
+      <div class="content">
+        <div class="quote-text">${cached.q}</div>
+        <div class="quote-author">${cached.a}</div>
+      </div>`;
+    document.getElementById("quote-badge").textContent = "LIVE";
+    return;
+  }
+  // Try ZenQuotes API (free, no auth, CORS enabled). Fallback to local on failure.
+  try {
+    const res = await fetch("https://zenquotes.io/api/today", { signal: AbortSignal.timeout(4000) });
+    if (!res.ok) throw new Error("bad status " + res.status);
+    const data = await res.json();
+    if (!Array.isArray(data) || !data[0] || !data[0].q) throw new Error("bad shape");
+    const quote = { q: data[0].q, a: data[0].a || "Unknown" };
+    CACHE.set(cacheKey, quote, 24 * 60 * 60 * 1000);
+    const body = document.getElementById("quote-body");
+    body.innerHTML = `
+      <div class="content">
+        <div class="quote-text">${quote.q}</div>
+        <div class="quote-author">${quote.a}</div>
+      </div>`;
+    document.getElementById("quote-badge").textContent = "LIVE";
+  } catch (_) {
+    renderLocalQuote();
+  }
+}
+
+function renderWord() {
+  const w = WORDS[dayOfYear(new Date()) % WORDS.length];
+  const body = document.getElementById("word-body");
+  body.innerHTML = `
+    <div class="content">
+      <div class="word-text">${w.w}</div>
+      <div class="word-pos">${w.p}</div>
+      <div class="word-def">${w.d}</div>
+    </div>`;
+}
+
+
+/* ==== News: keyword → category label map ==================================
+   Order matters — more specific patterns first (regions/proper nouns
+   before generic topics) so a "Russian missile strike" becomes
+   "Russia Update" not generic "War Update". Fallback is "World News". */
+const NEWS_CATEGORIES = [
+  { re: /\b(ukraine|russia|russian|putin|zelensky|moscow|kyiv|kremlin)\b/i, label: "Russia Update" },
+  { re: /\b(israel|israeli|palestin|gaza|hamas|hezbollah|iran|iranian|syria|lebanon|houthi|yemen)\b/i, label: "Mideast" },
+  { re: /\b(china|chinese|taiwan|beijing|xi jinping|hong kong)\b/i, label: "China Update" },
+  { re: /\b(north korea|south korea|kim jong|pyongyang|seoul)\b/i, label: "Korea Update" },
+  { re: /\b(india|pakistan|modi|new delhi|mumbai|islamabad)\b/i, label: "South Asia" },
+  { re: /\b(africa|nigeria|kenya|ethiopia|sudan|south africa)\b/i, label: "Africa" },
+  { re: /\b(mexico|brazil|argentina|venezuela|colombia|chile|latin)\b/i, label: "Latin America" },
+  { re: /\b(war|invasion|missile|airstrike|troops|military|combat|offensive|ceasefire|front line|frontline)\b/i, label: "War Update" },
+  { re: /\b(election|elections|vote|voter|ballot|parliament|senate|congress|prime minister|president|chancellor)\b/i, label: "Politics" },
+  { re: /\b(market|stocks?|economy|inflation|gdp|recession|interest rate|fed|imf)\b/i, label: "Market Report" },
+  { re: /\b(climate|emission|warming|glacier|carbon|heatwave|drought)\b/i, label: "Climate" },
+  { re: /\b(flood|storm|hurricane|earthquake|wildfire|tsunami|typhoon|volcano|landslide|cyclone)\b/i, label: "Disaster" },
+  { re: /\b(ai |artificial intelligence|chatgpt|openai|anthropic|chip|semiconductor)\b/i, label: "Tech" },
+  { re: /\b(space|nasa|spacex|rocket|satellite|mars|moon|asteroid|iss)\b/i, label: "Space" },
+  { re: /\b(covid|virus|pandemic|outbreak|vaccine|disease|measles|cholera|bird flu)\b/i, label: "Health" },
+  { re: /\b(protest|rally|riot|demonstration|march|strike action|unrest)\b/i, label: "Protest" },
+  { re: /\b(tariff|trade war|sanction|embargo|import ban|export ban)\b/i, label: "Trade" },
+  { re: /\b(oil|gas price|opec|pipeline|nuclear plant|uranium|energy crisis)\b/i, label: "Energy" },
+  { re: /\b(united nations|\bun\b|nato|summit|diplomat|treaty|peace talks|ceasefire talks)\b/i, label: "Diplomacy" },
+  { re: /\b(european union|\beu\b|germany|france|spain|italy|britain|uk|london|berlin|paris)\b/i, label: "Europe" },
+  { re: /\b(america|american|washington|biden|trump|white house|pentagon)\b/i, label: "US Update" },
+  { re: /\b(scientist|research|study|breakthrough|discovery|experiment)\b/i, label: "Science" },
+  { re: /\b(arrest|murder|shooting|court|trial|verdict|conviction|sentenced)\b/i, label: "Crime" }
+];
+
+function categorize(title) {
+  for (const cat of NEWS_CATEGORIES) {
+    if (cat.re.test(title)) return cat.label;
+  }
+  return "World News";
+}
+
+/* ==== News: configured feeds (config.js → newsFeeds) ===================== */
+/* Feeds are fetched through rss2json.com, which returns CORS headers that
+   most feed hosts do not send. Items from all feeds are merged, newest
+   first, and the top three are shown with a keyword-derived category label. */
+const NEWS_CACHE_KEY = "news.feeds.v3";
+const NEWS_TTL_MS = 20 * 60 * 1000;  // 20 minutes
+const NEWS_FEEDS = (window.HOME_CONFIG && window.HOME_CONFIG.newsFeeds) || [];
+
+function newsSourceLabel() {
+  return NEWS_FEEDS.map(f => f.label || "feed").join(" + ") || "no feeds";
+}
+
+function renderNewsList(items, ageBadge) {
+  const body = document.getElementById("news-body");
+  body.innerHTML = `
+    <div class="content">
+      ${items.map(it => `
+        <a class="news-item" href="${escHtml(it.url)}" target="_blank" rel="noopener noreferrer">
+          <span class="news-label">${escHtml(it.label)}</span>
+          <span class="news-title">${escHtml(it.title)}</span>
+        </a>`).join("")}
+      <div class="w-src">${escHtml(newsSourceLabel())} // ${ageBadge}</div>
+    </div>`;
+}
+
+function renderNewsMessage(text, badge) {
+  const body = document.getElementById("news-body");
+  body.innerHTML = `
+    <div class="content">
+      <span class="placeholder">${escHtml(text)}</span>
+      <div class="w-src">${escHtml(newsSourceLabel())} // ${badge}</div>
+    </div>`;
+}
+
+/* Aggregator feeds (e.g. Reddit) put the external article in a "[link]"
+   anchor inside the item description; prefer it over the discussion link. */
+function extractExternalUrl(descriptionHtml, fallback) {
+  if (!descriptionHtml) return fallback;
+  const m = descriptionHtml.match(/<a\s+href="([^"]+)"[^>]*>\s*\[link\]\s*<\/a>/i);
+  return (m && m[1]) || fallback;
+}
+
+async function fetchFeed(feed) {
+  const url = "https://api.rss2json.com/v1/api.json?rss_url=" + encodeURIComponent(feed.url);
+  const res = await fetch(url, { signal: AbortSignal.timeout(6000) });
+  if (!res.ok) throw new Error("status " + res.status);
+  const data = await res.json();
+  if (data.status !== "ok") throw new Error("feed status " + data.status);
+  return (data.items || [])
+    .filter(it => it && it.title)
+    .map(it => ({
+      title: it.title,
+      url: extractExternalUrl(it.description, it.link),
+      label: categorize(it.title),
+      date: Date.parse(it.pubDate) || 0
+    }));
+}
+
+async function renderNews() {
+  if (!NEWS_FEEDS.length) {
+    renderNewsMessage("add feeds in config.js", "idle");
+    return;
+  }
+  const fresh = CACHE.get(NEWS_CACHE_KEY);
+  if (fresh) {
+    renderNewsList(fresh, "cached 20m");
+    return;
+  }
+  const results = await Promise.allSettled(NEWS_FEEDS.map(fetchFeed));
+  const items = results
+    .filter(r => r.status === "fulfilled")
+    .flatMap(r => r.value)
+    .sort((a, b) => b.date - a.date)
+    .slice(0, 3);
+  if (items.length) {
+    CACHE.set(NEWS_CACHE_KEY, items, NEWS_TTL_MS);
+    renderNewsList(items, "live");
+    return;
+  }
+  const stale = CACHE.getStale(NEWS_CACHE_KEY);
+  if (stale && stale.val) {
+    renderNewsList(stale.val, "stale");
+    return;
+  }
+  renderNewsMessage("no feed reachable", "offline");
+}
+
+/* ==== Spotify OAuth (PKCE) + Discover Weekly "song of the day" ============
+   PKCE flow chosen because:
+     - No client secret = safe to run entirely in the browser.
+     - Refresh tokens supported, so we only re-auth when the refresh token
+       itself is revoked / scopes change.
+   Redirect URI is pinned to window.location.origin + '/callback.html' —
+   must exactly match what's registered in the Spotify app dashboard
+   (http://127.0.0.1:8080/callback.html). */
+const SPOTIFY = {
+  authUrl: "https://accounts.spotify.com/authorize",
+  tokenUrl: "https://accounts.spotify.com/api/token",
+  api: "https://api.spotify.com/v1",
+  scopes: "user-read-currently-playing user-read-recently-played user-top-read playlist-read-private user-library-read",
+  lsKeys: {
+    cid:     "home.spotify.client_id",
+    verifier:"home.spotify.verifier",
+    access:  "home.spotify.access_token",
+    refresh: "home.spotify.refresh_token",
+    exp:     "home.spotify.expires_at",
+    dwId:    "home.spotify.dw_playlist_id"
+  },
+  redirectUri() { return window.location.origin + "/callback.html"; }
+};
+
+function spotifyClientId() { return localStorage.getItem(SPOTIFY.lsKeys.cid); }
+
+/* PKCE helpers — random 64-byte verifier, SHA-256 challenge, base64url. */
+function b64url(bytes) {
+  return btoa(String.fromCharCode(...bytes))
+    .replace(/\+/g, "-").replace(/\//g, "_").replace(/=+$/, "");
+}
+async function makeVerifier() {
+  const arr = new Uint8Array(64);
+  crypto.getRandomValues(arr);
+  return b64url(arr);
+}
+async function makeChallenge(verifier) {
+  const hash = await crypto.subtle.digest("SHA-256", new TextEncoder().encode(verifier));
+  return b64url(new Uint8Array(hash));
+}
+
+/* Kick off the authorization redirect. If no client_id stored yet, prompt
+   once — it's public (not secret), safe to live in localStorage. */
+async function spotifyConnect() {
+  let cid = spotifyClientId();
+  if (!cid) {
+    cid = prompt("Paste your Spotify Client ID (from developer.spotify.com → your app → Settings):");
+    if (!cid) return;
+    cid = cid.trim();
+    localStorage.setItem(SPOTIFY.lsKeys.cid, cid);
+  }
+  const verifier = await makeVerifier();
+  localStorage.setItem(SPOTIFY.lsKeys.verifier, verifier);
+  const challenge = await makeChallenge(verifier);
+  const params = new URLSearchParams({
+    response_type: "code",
+    client_id: cid,
+    redirect_uri: SPOTIFY.redirectUri(),
+    code_challenge_method: "S256",
+    code_challenge: challenge,
+    scope: SPOTIFY.scopes
+  });
+  window.location.href = `${SPOTIFY.authUrl}?${params}`;
+}
+
+/* Refresh expired access token using the stored refresh_token. */
+async function spotifyRefresh() {
+  const rt = localStorage.getItem(SPOTIFY.lsKeys.refresh);
+  const cid = spotifyClientId();
+  if (!rt || !cid) return false;
+  try {
+    const res = await fetch(SPOTIFY.tokenUrl, {
+      method: "POST",
+      headers: { "Content-Type": "application/x-www-form-urlencoded" },
+      body: new URLSearchParams({
+        grant_type: "refresh_token",
+        refresh_token: rt,
+        client_id: cid
+      })
+    });
+    if (!res.ok) return false;
+    const data = await res.json();
+    if (!data.access_token) return false;
+    localStorage.setItem(SPOTIFY.lsKeys.access, data.access_token);
+    localStorage.setItem(SPOTIFY.lsKeys.exp, Date.now() + (data.expires_in - 60) * 1000);
+    if (data.refresh_token) localStorage.setItem(SPOTIFY.lsKeys.refresh, data.refresh_token);
+    return true;
+  } catch (_) { return false; }
+}
+
+/* Valid-token getter: returns a good token or null (triggers refresh if
+   the stored one is within 60s of expiry). */
+async function spotifyToken() {
+  const t = localStorage.getItem(SPOTIFY.lsKeys.access);
+  const exp = parseInt(localStorage.getItem(SPOTIFY.lsKeys.exp) || "0");
+  if (t && Date.now() < exp) return t;
+  if (await spotifyRefresh()) return localStorage.getItem(SPOTIFY.lsKeys.access);
+  return null;
+}
+
+async function spotifyFetchJson(path, token) {
+  const res = await fetch(`${SPOTIFY.api}${path}`, {
+    headers: { "Authorization": `Bearer ${token}` }
+  });
+  if (res.status === 401) {
+    // Token rejected — try one refresh, then bail.
+    if (await spotifyRefresh()) {
+      const t2 = localStorage.getItem(SPOTIFY.lsKeys.access);
+      return (await fetch(`${SPOTIFY.api}${path}`, {
+        headers: { "Authorization": `Bearer ${t2}` }
+      })).json();
+    }
+  }
+  if (!res.ok) throw new Error("spotify " + res.status);
+  return res.json();
+}
+
+/* Find + cache the Discover Weekly playlist ID (it's a user-specific
+   playlist so we have to resolve by name from the user's library). */
+async function findDiscoverWeekly(token) {
+  let id = localStorage.getItem(SPOTIFY.lsKeys.dwId);
+  if (id) return id;
+  // Paginate through /me/playlists — 50 per page is the max.
+  let url = "/me/playlists?limit=50";
+  while (url) {
+    const data = await spotifyFetchJson(url, token);
+    const dw = (data.items || []).find(p => p.name === "Discover Weekly");
+    if (dw) {
+      localStorage.setItem(SPOTIFY.lsKeys.dwId, dw.id);
+      return dw.id;
+    }
+    url = data.next ? data.next.replace(SPOTIFY.api, "") : null;
+  }
+  throw new Error("Discover Weekly not found in your library — have you followed it?");
+}
+
+function renderSpotifyConnected(track) {
+  const body = document.getElementById("spotify-body");
+  const art = track.album?.images?.find(i => i.width <= 300) || track.album?.images?.[0];
+  const artists = (track.artists || []).map(a => a.name).join(", ");
+  body.innerHTML = `
+    <div class="content">
+      <a class="spotify-track" href="${escHtml(track.external_urls?.spotify || "#")}" target="_blank" rel="noopener noreferrer">
+        ${art ? `<img class="spotify-art" src="${escHtml(art.url)}" alt="">` : ""}
+        <div class="spotify-meta">
+          <div class="spotify-title">${escHtml(track.name)}</div>
+          <div class="spotify-artist">${escHtml(artists)}</div>
+          <div class="spotify-album">${escHtml(track.album?.name || "")}</div>
+        </div>
+      </a>
+      <div class="w-src">spotify // discover weekly</div>
+    </div>`;
+}
+
+function renderSpotifyNotConnected(hint) {
+  const body = document.getElementById("spotify-body");
+  body.innerHTML = `
+    <div class="content spotify-connect-wrap">
+      <button class="spotify-connect" onclick="spotifyConnect()">connect spotify</button>
+      ${hint ? `<div class="spotify-hint">${escHtml(hint)}</div>` : ""}
+    </div>`;
+}
+
+async function renderSpotify() {
+  if (!spotifyClientId()) {
+    renderSpotifyNotConnected("paste client id on first connect");
+    return;
+  }
+  const token = await spotifyToken();
+  if (!token) {
+    renderSpotifyNotConnected("session expired — reconnect");
+    return;
+  }
+  try {
+    const dwId = await findDiscoverWeekly(token);
+    // 6h cache on track list — Spotify only refreshes DW on Mondays anyway.
+    const cacheKey = "spotify.dw.tracks";
+    let tracks = CACHE.get(cacheKey);
+    if (!tracks) {
+      const data = await spotifyFetchJson(`/playlists/${dwId}/tracks?limit=50&fields=items(track(id,name,external_urls,artists(name),album(name,images)))`, token);
+      tracks = (data.items || []).map(i => i.track).filter(t => t && t.id);
+      if (!tracks.length) throw new Error("playlist is empty");
+      CACHE.set(cacheKey, tracks, 6 * 60 * 60 * 1000);
+    }
+    const track = tracks[dayOfYear(new Date()) % tracks.length];
+    renderSpotifyConnected(track);
+  } catch (e) {
+    const body = document.getElementById("spotify-body");
+    body.innerHTML = `
+      <div class="content spotify-connect-wrap">
+        <span class="placeholder">${escHtml(e.message || "spotify error")}</span>
+        <button class="spotify-connect" onclick="spotifyConnect()" style="margin-top:12px">reconnect</button>
+      </div>`;
+  }
+}
+
+function renderAll() {
+  renderTarot();
+  renderWord();
+  renderQuote();
+  renderNews();
+  renderSpotify();
+}
+renderAll();
+
+/* Day-roll auto-refresh: if the page is left open past midnight, re-render
+   all day-keyed widgets (tarot, word, quote, spotify DW pick)
+   when todayKey() flips. Check every minute — cheap. News refreshes on its
+   own 20-min TTL so it's idempotent if renderNews is called again. */
+let _lastDayKey = todayKey();
+setInterval(() => {
+  const now = todayKey();
+  if (now !== _lastDayKey) {
+    _lastDayKey = now;
+    renderAll();
+  }
+}, 60000);
+</script>
+</body>
+</html>

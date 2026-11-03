@@ -1,0 +1,17 @@
+#!/usr/bin/env bash
+# SelfCheckout rice: black wallpaper + fullscreen GRTA face (conky).
+set -u
+
+WALL="$HOME/Pictures/wallpapers/selfcheckout/grta-bg-black.png"
+CONF="$HOME/.config/conky/grta/conky.conf"
+
+pkill -f "conky.*grta" 2>/dev/null || true
+sleep 0.3
+
+gsettings set org.gnome.desktop.background picture-uri      "file://$WALL"
+gsettings set org.gnome.desktop.background picture-uri-dark "file://$WALL"
+gsettings set org.gnome.desktop.background picture-options  'stretched'
+
+conky -c "$CONF" -d
+
+echo "wallpaper-grta: black wallpaper + fullscreen GRTA launched"

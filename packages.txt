@@ -1,0 +1,33 @@
+# SelfCheckout rice — package manifest
+# Parsed by install.sh to drive apt + flatpak installs.
+# Comments and blank lines ignored. Groups delineated by [section] markers.
+
+[apt]
+# Core desktop tooling
+stow
+conky-all
+kitty
+imagemagick
+ffmpeg
+mpv
+build-essential
+libx11-dev
+libxext-dev
+libxrender-dev
+flatpak
+libxrandr-dev
+
+# Cursor theme (optional: see README for the green Oxygen variant)
+bibata-cursor-theme
+
+[flatpak]
+# Secondary browser. Primary Firefox is the snap (already present on Ubuntu 22.04).
+# User install only — no sudo needed at flatpak stage.
+io.gitlab.librewolf-community
+
+[vendored]
+# Shipped inside repo; install.sh copies to the right place.
+fonts/VT323-Regular.ttf                         # Google Fonts, OFL (fonts/OFL-VT323.txt)
+fonts/MajorMonoDisplay-Regular.ttf              # Google Fonts, OFL (fonts/OFL-MajorMonoDisplay.txt)
+themes/SelfCheckout/                            # custom shell theme (GNOME 42.9 fragile — see README)
+wallpapers/*.png

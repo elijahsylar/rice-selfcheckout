@@ -1,0 +1,10 @@
+[/]
+color-scheme='prefer-dark'
+cursor-size=24
+document-font-name='Cantarell 14'
+font-name='Cantarell 14'
+gtk-theme='Yaru-dark'
+icon-theme='Yaru'
+monospace-font-name='Monospace 14'
+show-battery-percentage=true
+text-scaling-factor=1.2

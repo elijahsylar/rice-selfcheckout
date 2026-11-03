@@ -1,0 +1,45 @@
+# SelfCheckout rice — gitignore
+
+# Local overrides
+local.conf
+local/
+*.local
+.env
+.env.*
+
+# Secrets — belt + braces
+secrets*
+*secret*
+*.key
+*.pem
+*.p12
+*token*
+credentials*
+
+# Build / runtime byproducts
+*.log
+# compiled overlay binary (source + Makefile stay tracked)
+overlay/crt-overlay
+overlay/*.o
+
+# OS / editor cruft
+.DS_Store
+Thumbs.db
+*.swp
+*.swo
+*~
+.vscode/
+.idea/
+
+# Claude Code internal scratch
+.claude/
+
+# Local data, dumps, run output
+data/
+runs/
+logs/
+backups/
+*.sql
+*.sql.gz
+*.db
+__pycache__/
