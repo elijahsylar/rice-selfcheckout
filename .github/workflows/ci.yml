@@ -1,0 +1,20 @@
+name: CI
+
+on:
+  push:
+  pull_request:
+
+permissions:
+  contents: read
+
+jobs:
+  checks:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Lua and the X11/GL headers for the overlay build
+        run: sudo apt-get update && sudo apt-get install -y lua5.4 libx11-dev libxext-dev libgl-dev
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+      - run: tests/run.sh

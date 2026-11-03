@@ -4,8 +4,11 @@
 set -euo pipefail
 cd "$(dirname "$(readlink -f "$0")")/.."
 
+LUA="$(command -v lua || command -v lua5.4 || command -v lua5.3 || true)"
+[[ -n "$LUA" ]] || { echo "lua not found (install lua5.4)"; exit 1; }
+
 echo "== GRTA mood schedule"
-lua tests/test_moods.lua | tail -1
+"$LUA" tests/test_moods.lua | tail -1
 
 echo "== shell syntax"
 for f in install.sh overlay/toggle.sh scripts/*; do bash -n "$f" && echo "ok   $f"; done
