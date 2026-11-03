@@ -1,6 +1,6 @@
 # SelfCheckout rice
 
-[![CI](https://github.com/elijahsylar/rice-selfcheckout/actions/workflows/ci.yml/badge.svg)](https://github.com/elijahsylar/rice-selfcheckout/actions/workflows/ci.yml)
+[![CI](https://github.com/elijahsylar/rice-selfcheckout/actions/workflows/ci.yml/badge.svg?branch=main)](https://github.com/elijahsylar/rice-selfcheckout/actions/workflows/ci.yml)
 
 A phosphor-green CRT desktop theme for Ubuntu 22.04 with GNOME 42 on X11, plus GRTA: a fullscreen pixel face that sits on the desktop and changes expression with the time of day. One palette and two fonts are carried through every visible surface (terminal, editor, browser chrome, GTK apps, the GNOME panel, a browser new-tab dashboard), and an optional OpenGL overlay adds scanlines, grain and signal glitches on top of everything.
 
