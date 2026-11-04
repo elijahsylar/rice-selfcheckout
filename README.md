@@ -90,6 +90,7 @@ Runs the GRTA schedule tests (Lua, 48 checks: hour-to-face mapping, wrap-around 
 - **GNOME Shell theming is fragile on Ubuntu 22.04 with Yaru.** If the panel disappears after reloading the shell, revert with `dconf write /org/gnome/shell/extensions/user-theme/name "''"` and reload again.
 - **The CRT overlay works on one monitor.** Hotplug or reconfiguration drops the effect; it needs an XRandR `RRScreenChangeNotify` listener.
 - **Conky with the `override` window type** fails with `BadMatch` on GNOME/Mutter with ARGB visuals; the configs use the `desktop` type instead.
+- **`install.sh` and apostrophes.** The installer runs its steps through `eval`, so a home directory or clone path containing `'` breaks it. Spaces are fine.
 
 ## Project status
 
