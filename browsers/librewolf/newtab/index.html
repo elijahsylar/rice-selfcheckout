@@ -1099,7 +1099,7 @@ function renderNewsList(items, ageBadge) {
   body.innerHTML = `
     <div class="content">
       ${items.map(it => `
-        <a class="news-item" href="${escHtml(it.url)}" target="_blank" rel="noopener noreferrer">
+        <a class="news-item" href="${escHtml(safeUrl(it.url))}" target="_blank" rel="noopener noreferrer">
           <span class="news-label">${escHtml(it.label)}</span>
           <span class="news-title">${escHtml(it.title)}</span>
         </a>`).join("")}
@@ -1121,7 +1121,19 @@ function renderNewsMessage(text, badge) {
 function extractExternalUrl(descriptionHtml, fallback) {
   if (!descriptionHtml) return fallback;
   const m = descriptionHtml.match(/<a\s+href="([^"]+)"[^>]*>\s*\[link\]\s*<\/a>/i);
-  return (m && m[1]) || fallback;
+  // The href comes out of feed HTML, so its "&" may still be "&amp;".
+  return (m && m[1] && m[1].replace(/&amp;/g, "&")) || fallback;
+}
+
+// Feed links go into href: only http(s) URLs, anything else (javascript:,
+// data:, garbage) becomes "#".
+function safeUrl(u) {
+  try {
+    const parsed = new URL(u);
+    return parsed.protocol === "http:" || parsed.protocol === "https:" ? parsed.href : "#";
+  } catch (_) {
+    return "#";
+  }
 }
 
 async function fetchFeed(feed) {
