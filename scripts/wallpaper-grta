@@ -5,7 +5,9 @@ set -u
 WALL="$HOME/Pictures/wallpapers/selfcheckout/grta-bg-black.png"
 CONF="$HOME/.config/conky/grta/conky.conf"
 
-pkill -f "conky.*grta" 2>/dev/null || true
+# Only the GRTA conky itself (a looser pattern also matched e.g. an editor
+# open on ~/.config/conky/grta/face.lua).
+pkill -f '^conky -c .*/conky/grta/conky\.conf( |$)' 2>/dev/null || true
 sleep 0.3
 
 gsettings set org.gnome.desktop.background picture-uri      "file://$WALL"
