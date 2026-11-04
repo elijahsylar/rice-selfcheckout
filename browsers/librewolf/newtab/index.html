@@ -48,6 +48,9 @@
     );
   }
 
+  /* the main landmark: no box of its own, so the layout is untouched */
+  .page-main { display: contents; }
+
   .wrap {
     max-width: 1400px;
     margin: 0 auto;
@@ -483,7 +486,7 @@
 <div class="wrap">
 
   <header>
-    <div class="greeting">
+    <div class="greeting" role="heading" aria-level="1">
       <span id="greeting">boot sequence</span><span class="cursor"></span>
     </div>
     <div class="clock">
@@ -493,8 +496,10 @@
     </div>
   </header>
 
+  <div class="page-main" role="main">
+
   <!-- ===== ROW 1 — launchers ===== -->
-  <div class="row-label">PROJECTS</div>
+  <div class="row-label" role="heading" aria-level="2">PROJECTS</div>
   <section class="grid-5">
 
     <a class="card launcher" href="https://github.com">
@@ -589,7 +594,7 @@
   </section>
 
   <!-- ===== ROW 2 — daily widgets ===== -->
-  <div class="row-label">DAILY</div>
+  <div class="row-label" role="heading" aria-level="2">DAILY</div>
   <section class="grid-3">
 
 
@@ -620,7 +625,7 @@
   </section>
 
   <!-- ===== ROW 3 — news feed + spotify ===== -->
-  <div class="row-label">FEED</div>
+  <div class="row-label" role="heading" aria-level="2">FEED</div>
   <section class="grid-2">
     <article class="card widget news-widget">
       <div class="w-head">
@@ -639,7 +644,7 @@
   </section>
 
   <!-- ===== ROW 4 — weather + calendar ===== -->
-  <div class="row-label">SIGNALS</div>
+  <div class="row-label" role="heading" aria-level="2">SIGNALS</div>
   <section class="grid-2 row-lower">
 
     <article class="card widget">
@@ -659,6 +664,8 @@
     </article>
 
   </section>
+
+  </div>
 
   <footer>HOME // <span id="hostline">localhost</span> // phase 01 // shell</footer>
 
