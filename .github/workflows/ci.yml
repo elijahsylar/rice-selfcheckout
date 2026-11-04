@@ -12,10 +12,10 @@ jobs:
     runs-on: ubuntu-latest
     timeout-minutes: 20
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v7
       - name: Lua and the X11/GL headers for the overlay build
         run: sudo apt-get update && sudo apt-get install -y lua5.4 libx11-dev libxext-dev libgl-dev
-      - uses: actions/setup-node@v4
+      - uses: actions/setup-node@v7
         with:
           node-version: 20
       - run: tests/run.sh
