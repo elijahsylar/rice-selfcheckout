@@ -970,7 +970,7 @@ const CACHE = {
   }
 };
 
-/* Minimal HTML-escape for user-controlled strings (news titles). */
+/* Minimal HTML-escape for strings from outside the page (news, quotes, Spotify). */
 function escHtml(s) {
   return String(s).replace(/[&<>"']/g, ch =>
     ({ "&":"&amp;", "<":"&lt;", ">":"&gt;", '"':"&quot;", "'":"&#39;" }[ch]));
@@ -1007,8 +1007,8 @@ async function renderQuote() {
     const body = document.getElementById("quote-body");
     body.innerHTML = `
       <div class="content">
-        <div class="quote-text">${cached.q}</div>
-        <div class="quote-author">${cached.a}</div>
+        <div class="quote-text">${escHtml(cached.q)}</div>
+        <div class="quote-author">${escHtml(cached.a)}</div>
       </div>`;
     document.getElementById("quote-badge").textContent = "LIVE";
     return;
@@ -1024,8 +1024,8 @@ async function renderQuote() {
     const body = document.getElementById("quote-body");
     body.innerHTML = `
       <div class="content">
-        <div class="quote-text">${quote.q}</div>
-        <div class="quote-author">${quote.a}</div>
+        <div class="quote-text">${escHtml(quote.q)}</div>
+        <div class="quote-author">${escHtml(quote.a)}</div>
       </div>`;
     document.getElementById("quote-badge").textContent = "LIVE";
   } catch (_) {
