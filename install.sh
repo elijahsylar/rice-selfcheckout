@@ -32,6 +32,32 @@ warn() { printf '\033[1;33m==!\033[0m %s\n' "$*"; }
 die()  { printf '\033[1;31mxx!\033[0m %s\n' "$*" >&2; exit 1; }
 run()  { if [[ $DRY -eq 1 ]]; then printf '  (dry) %s\n' "$*"; else eval "$@"; fi; }
 
+# backup <path> [move]: keep a copy of an existing file under $BACKUP (same
+# path, relative to $HOME) before it is replaced; "move" also takes it out of the
+# way, for stow, which refuses to replace regular files.
+backup() {
+    local path="$1" mode="${2:-copy}"
+    [[ -e "$path" || -L "$path" ]] || return 0
+    # Already one of our links: nothing of the user's to keep.
+    if [[ -L "$path" && "$(readlink -f "$path")" == "$REPO"/* ]]; then return 0; fi
+    if [[ $DRY -eq 1 ]]; then printf '  (dry) back up %s\n' "$path"; return 0; fi
+    mkdir -p "$BACKUP"
+    if [[ "$path" == "$HOME"/* ]]; then
+        (cd "$HOME" && cp -a --parents -- "${path#"$HOME"/}" "$BACKUP/")
+    else
+        cp -a --parents -- "$path" "$BACKUP/"
+    fi
+    [[ "$mode" == move ]] && rm -f -- "$path"
+    return 0
+}
+# backup_tree <package dir> <target dir> [move]: every file the package will place
+backup_tree() {
+    local pkg="$1" target="$2" mode="${3:-copy}" rel
+    while IFS= read -r -d '' rel; do
+        backup "$target/${rel#./}" "$mode"
+    done < <(cd "$pkg" && find . \( -type f -o -type l \) -print0)
+}
+
 # --- 1. distro check ---------------------------------------------------------
 say "Distro check"
 . /etc/os-release
@@ -101,11 +127,17 @@ done
 
 if command -v stow >/dev/null; then
     say "stow-linking config / themes / scripts"
+    backup_tree "$REPO/config"  "$HOME/.config"    move
+    backup_tree "$REPO/themes"  "$HOME/.themes"    move
+    backup_tree "$REPO/scripts" "$HOME/.local/bin" move
     run "stow -d '$REPO' -t '$HOME/.config'    --no-folding -R config"
     run "stow -d '$REPO' -t '$HOME/.themes'    --no-folding -R themes"
     run "stow -d '$REPO' -t '$HOME/.local/bin' --no-folding -R scripts"
 else
     warn "stow missing — falling back to cp -r (no symlinks, manual sync later)"
+    backup_tree "$REPO/config"  "$HOME/.config"
+    backup_tree "$REPO/themes"  "$HOME/.themes"
+    backup_tree "$REPO/scripts" "$HOME/.local/bin"
     run "cp -r '$REPO/config/.'    '$HOME/.config/'"
     run "cp -r '$REPO/themes/.'    '$HOME/.themes/'"
     run "cp    '$REPO/scripts/'*   '$HOME/.local/bin/'"
@@ -113,7 +145,11 @@ else
 fi
 
 # --- 8. GNOME dconf ----------------------------------------------------------
-say "Load GNOME dconf subtrees"
+say "Load GNOME dconf subtrees (current values saved to $BACKUP/dconf/ first)"
+run "mkdir -p '$BACKUP/dconf'"
+for sub in terminal desktop/interface desktop/background shell; do
+    run "dconf dump /org/gnome/$sub/ > '$BACKUP/dconf/${sub//\//-}.dconf'"
+done
 run "dconf load /org/gnome/terminal/                           < '$REPO/gnome-dconf/terminal.dconf'"
 run "dconf load /org/gnome/desktop/interface/                  < '$REPO/gnome-dconf/interface.dconf'"
 # background.dconf holds @HOME@ placeholders (dconf files cannot expand $HOME).
@@ -137,6 +173,9 @@ install_browser_chrome() {
     [[ -n "$default_path" ]] || { warn "$browser: no default profile found; skip"; return; }
     local profile_dir="$profiles_root/$default_path"
     say "$browser chrome → $profile_dir"
+    backup "$profile_dir/chrome/userChrome.css"
+    backup "$profile_dir/chrome/userContent.css"
+    backup "$profile_dir/user.js"
     run "mkdir -p '$profile_dir/chrome'"
     run "cp '$src/userChrome.css'  '$profile_dir/chrome/'"
     run "cp '$src/userContent.css' '$profile_dir/chrome/'"
@@ -163,7 +202,7 @@ fi
 # --- 10. Wallpaper + GRTA launcher ------------------------------------------
 say "Set wallpaper + launch GRTA"
 if [[ -x "$HOME/.local/bin/wallpaper-grta" ]]; then
-    run "$HOME/.local/bin/wallpaper-grta"
+    run "'$HOME/.local/bin/wallpaper-grta'"
 fi
 
 # --- 11. Summary + manual steps ---------------------------------------------
