@@ -96,6 +96,10 @@ Runs the GRTA schedule tests (Lua, 48 checks: hour-to-face mapping, wrap-around 
 
 A personal desktop setup, in daily use on one machine and shared as-is.
 
+## Project history
+
+The private original has commits from 20 April 2026 to 19 May 2026. This public repository is a scrubbed snapshot of that private original, published in November 2026, which is why its commit history is short. Developed with Claude Code under a gated workflow of written plan, implementation, separate review and my sign-off.
+
 ## License
 
 MIT for the code and configs (see [LICENSE](LICENSE)). The fonts in `fonts/` are under the SIL Open Font License; their license texts are next to them.
